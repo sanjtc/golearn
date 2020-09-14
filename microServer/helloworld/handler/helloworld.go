@@ -5,7 +5,7 @@ import (
 
 	"github.com/micro/go-micro/v3/logger"
 
-	"golearn/microServer/helloworld"
+	helloworld "golearn/microServer/helloworld/proto"
 )
 
 type Helloworld struct{}
