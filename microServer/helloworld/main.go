@@ -13,7 +13,6 @@ func main() {
 		service.Version("latest"),
 	)
 
-	//helloworld.RegisterHelloworldHandler(srv.Server(), new(handler.Helloworld))
 	srv.Handle(new(handler.Helloworld))
 	if err := srv.Run(); err != nil {
 		logger.Fatal(err)
