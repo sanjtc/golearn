@@ -1,4 +1,4 @@
-module golearn/microServer/helloworld
+module github.com/pantskun/golearn/microServer/helloworld
 
 go 1.14
 

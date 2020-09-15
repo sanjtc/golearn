@@ -1,4 +1,4 @@
-module customEtcdclt
+module github.com/pantskun/golearn/customEtcdclt
 
 go 1.14
 
