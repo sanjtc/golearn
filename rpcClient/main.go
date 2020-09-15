@@ -7,7 +7,7 @@ import (
 	"log"
 	"os"
 
-	pb "github.com/pantskun/golearn/rpcDemo/proto"
+	pb "github.com/pantskun/golearn/rpcDemo/proto/consignment"
 	"google.golang.org/grpc"
 )
 
