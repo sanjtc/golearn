@@ -1,15 +1,3 @@
-// +build OMIT
-
-// The server program issues Google search requests and demonstrates the use of
-// the go.net Context API. It serves on port 8080.
-//
-// The /search endpoint accepts these query params:
-//   q=the Google search query
-//   timeout=a timeout for the request, in time.Duration format
-//
-// For example, http://localhost:8080/search?q=golang&timeout=1s serves the
-// first few Google search results for "golang" or a "deadline exceeded" error
-// if the timeout expires.
 package main
 
 import (
