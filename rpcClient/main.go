@@ -7,12 +7,12 @@ import (
 	"log"
 	"os"
 
-	pb "github.com/pantskun/golearn/rpcDemo/proto/consignment"
+	pb "github.com/pantskun/golearn/rpcDemo/proto"
 	"google.golang.org/grpc"
 )
 
 const (
-	address         = "localhost:50051"
+	address         = "localhost:10086"
 	defaultFilename = "consignment.json"
 )
 
