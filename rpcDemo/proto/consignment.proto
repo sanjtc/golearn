@@ -32,5 +32,5 @@ message Response {
   Consignment consignment = 2;
 
   // Added a pluralised consignment to our generic response message
-  repeated Consignment consigments = 3;
+  repeated Consignment consignments = 3;
 }
