@@ -9,7 +9,7 @@ import (
 func StartHTTPListen(addr string) {
 	http.HandleFunc("/get", GetActionHandler)
 	http.HandleFunc("/put", PutActionHandler)
-	http.HandleFunc("/delete", DeleteActionHandler)
+	http.HandleFunc("/del", DeleteActionHandler)
 
 	fmt.Println("start listen to ", addr)
 	http.ListenAndServe(addr, nil)

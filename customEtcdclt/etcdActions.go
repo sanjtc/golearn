@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"strconv"
 
 	"github.com/coreos/etcd/clientv3"
 )
@@ -110,7 +111,7 @@ func (action EtcdActionDelete) Exec() ([]string, error) {
 	if getResp, err = kv.Delete(context.TODO(), action.Key); err != nil {
 		return nil, err
 	}
-	return []string{string(getResp.Deleted)}, nil
+	return []string{strconv.FormatInt(getResp.Deleted, 10)}, nil
 }
 
 // ConnectEtcd return etcd client
