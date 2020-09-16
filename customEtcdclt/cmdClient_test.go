@@ -3,6 +3,17 @@ package main
 import "testing"
 
 func TestParseCmdAction(t *testing.T) {
+	invalidCmd := [][]string{
+		nil,
+		[]string{"other"},
+	}
+	for _, cmd := range invalidCmd {
+		action := parseCmdAction(cmd)
+		if action != nil {
+			t.Errorf("none cmd can not get action")
+		}
+	}
+
 	getCmds := [][]string{
 		[]string{"get"},
 		[]string{"get", "key"},
