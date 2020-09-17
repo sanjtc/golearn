@@ -1,8 +1,35 @@
 package main
 
-import "testing"
+import (
+	"fmt"
+	"testing"
+)
+
+type cmdTestInfo struct {
+	cmd    []string
+	action EtcdActionInterface
+}
 
 func TestParseCmdAction(t *testing.T) {
+
+	cmdCases := []cmdTestInfo{
+		{nil, nil},
+		{[]string{"other"}, nil},
+		{[]string{"get"}, EtcdActionGet{&EtcdActionBase{EtcdActGet}, "", ""}},
+		{[]string{"get", "key"}, EtcdActionGet{&EtcdActionBase{EtcdActGet}, "key", ""}},
+		{[]string{"get", "key", "rangeEnd"}, EtcdActionGet{&EtcdActionBase{EtcdActGet}, "key", "rangeEnd"}},
+		{[]string{"get", "key", "rangeEnd", "other"}, EtcdActionGet{&EtcdActionBase{EtcdActGet}, "key", "rangeEnd"}},
+	}
+
+	for _, cmdCase := range cmdCases {
+		action := parseCmdAction(cmdCase.cmd)
+		if action.Equal(cmdCase.action) {
+			fmt.Println(action)
+			fmt.Println(cmdCase.action)
+			t.Errorf("get unexpect action")
+		}
+	}
+
 	invalidCmd := [][]string{
 		nil,
 		[]string{"other"},
