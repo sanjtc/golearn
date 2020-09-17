@@ -22,7 +22,7 @@ func TestParseCmdAction(t *testing.T) {
 		{[]string{"get", "key", "rangeEnd", "other"}, EtcdActionGet{EtcdActionBase{EtcdActGet}, "key", "rangeEnd"}},
 
 		{[]string{"put"}, EtcdActionPut{EtcdActionBase{EtcdActPut}, "", ""}},
-		{[]string{"put", "key"}, EtcdActionPut{EtcdActionBase{EtcdActPut}, "key", ""}},
+		{[]string{"put", "key"}, EtcdActionPut{EtcdActionBase{EtcdActPut}, "", ""}},
 		{[]string{"put", "key", "value"}, EtcdActionPut{EtcdActionBase{EtcdActPut}, "key", "value"}},
 		{[]string{"put", "key", "value", "other"}, EtcdActionPut{EtcdActionBase{EtcdActPut}, "key", "value"}},
 

@@ -7,7 +7,7 @@ import (
 	"github.com/coreos/etcd/clientv3"
 )
 
-const httpMode = true
+const httpMode = false
 
 var config clientv3.Config = clientv3.Config{
 	Endpoints:   []string{"127.0.0.1:2379"},
