@@ -1,10 +1,13 @@
 package main
 
 import (
+	"flag"
 	"time"
 
 	"github.com/coreos/etcd/clientv3"
 )
+
+const httpMode = true
 
 var config clientv3.Config = clientv3.Config{
 	Endpoints:   []string{"127.0.0.1:2379"},
@@ -12,8 +15,11 @@ var config clientv3.Config = clientv3.Config{
 }
 
 func main() {
-	// flag.Parse()
-	// argv := flag.Args()
-	// ParseCommand(argv)
-	StartHTTPListen(":8080")
+	if httpMode {
+		StartHTTPListen(":8080")
+	} else {
+		flag.Parse()
+		argv := flag.Args()
+		ParseCommand(argv)
+	}
 }
