@@ -39,27 +39,27 @@ func parseCmdAction(argv []string) EtcdActionInterface {
 
 func parseCmdGetAction(argv []string) EtcdActionInterface {
 	if argc := len(argv); argc < 2 {
-		return EtcdActionGet{&EtcdActionBase{EtcdActGet}, "", ""}
+		return EtcdActionGet{EtcdActionBase{EtcdActGet}, "", ""}
 	} else if argc > 2 {
-		return EtcdActionGet{&EtcdActionBase{EtcdActGet}, argv[1], argv[2]}
+		return EtcdActionGet{EtcdActionBase{EtcdActGet}, argv[1], argv[2]}
 	} else {
-		return EtcdActionGet{&EtcdActionBase{EtcdActGet}, argv[1], ""}
+		return EtcdActionGet{EtcdActionBase{EtcdActGet}, argv[1], ""}
 	}
 }
 
 func parseCmdPutAction(argv []string) EtcdActionInterface {
 	if argc := len(argv); argc < 3 {
-		return EtcdActionPut{&EtcdActionBase{EtcdActPut}, "", ""}
+		return EtcdActionPut{EtcdActionBase{EtcdActPut}, "", ""}
 	}
-	return EtcdActionPut{&EtcdActionBase{EtcdActPut}, argv[1], argv[2]}
+	return EtcdActionPut{EtcdActionBase{EtcdActPut}, argv[1], argv[2]}
 }
 
 func parseCmdDeleteAction(argv []string) EtcdActionInterface {
 	if argc := len(argv); argc < 2 {
-		return EtcdActionDelete{&EtcdActionBase{EtcdActDelete}, "", ""}
+		return EtcdActionDelete{EtcdActionBase{EtcdActDelete}, "", ""}
 	} else if argc > 2 {
-		return EtcdActionDelete{&EtcdActionBase{EtcdActDelete}, argv[1], argv[2]}
+		return EtcdActionDelete{EtcdActionBase{EtcdActDelete}, argv[1], argv[2]}
 	} else {
-		return EtcdActionDelete{&EtcdActionBase{EtcdActDelete}, argv[1], ""}
+		return EtcdActionDelete{EtcdActionBase{EtcdActDelete}, argv[1], ""}
 	}
 }

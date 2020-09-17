@@ -30,21 +30,21 @@ type EtcdActionBase struct {
 
 // EtcdActionGet etcd get action info
 type EtcdActionGet struct {
-	*EtcdActionBase
+	base     EtcdActionBase
 	Key      string
 	RangeEnd string
 }
 
 // EtcdActionPut etcd put action info
 type EtcdActionPut struct {
-	*EtcdActionBase
+	base  EtcdActionBase
 	Key   string
 	Value string
 }
 
 // EtcdActionDelete etcd delete action info
 type EtcdActionDelete struct {
-	*EtcdActionBase
+	base     EtcdActionBase
 	Key      string
 	RangeEnd string
 }

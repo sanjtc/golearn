@@ -21,7 +21,7 @@ func GetActionHandler(w http.ResponseWriter, r *http.Request) {
 	key := query.Get("key")
 	rangeEnd := query.Get("rangeEnd")
 
-	action := EtcdActionGet{&EtcdActionBase{EtcdActGet}, key, rangeEnd}
+	action := EtcdActionGet{EtcdActionBase{EtcdActGet}, key, rangeEnd}
 	ExecEtcdAction(action, w)
 }
 
@@ -31,7 +31,7 @@ func PutActionHandler(w http.ResponseWriter, r *http.Request) {
 	key := query.Get("key")
 	value := query.Get("value")
 
-	action := EtcdActionPut{&EtcdActionBase{EtcdActPut}, key, value}
+	action := EtcdActionPut{EtcdActionBase{EtcdActPut}, key, value}
 	ExecEtcdAction(action, w)
 }
 
@@ -41,7 +41,7 @@ func DeleteActionHandler(w http.ResponseWriter, r *http.Request) {
 	key := query.Get("key")
 	rangeEnd := query.Get("rangeEnd")
 
-	action := EtcdActionDelete{&EtcdActionBase{EtcdActGet}, key, rangeEnd}
+	action := EtcdActionDelete{EtcdActionBase{EtcdActGet}, key, rangeEnd}
 	ExecEtcdAction(action, w)
 }
 
