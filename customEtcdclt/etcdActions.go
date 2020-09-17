@@ -50,46 +50,46 @@ type EtcdActionDelete struct {
 }
 
 // Equal get action
-func (a EtcdActionGet) Equal(b EtcdActionInterface) bool {
+func (action EtcdActionGet) Equal(b EtcdActionInterface) bool {
 	v, ok := b.(EtcdActionGet)
 	if !ok {
 		return false
 	}
 
-	if a.Key != v.Key {
+	if action.Key != v.Key {
 		return false
 	}
-	if a.RangeEnd != v.RangeEnd {
+	if action.RangeEnd != v.RangeEnd {
 		return false
 	}
 	return true
 }
 
 // Equal delete action
-func (a EtcdActionDelete) Equal(b EtcdActionInterface) bool {
+func (action EtcdActionDelete) Equal(b EtcdActionInterface) bool {
 	v, ok := b.(EtcdActionDelete)
 	if !ok {
 		return false
 	}
-	if a.Key != v.Key {
+	if action.Key != v.Key {
 		return false
 	}
-	if a.RangeEnd != v.RangeEnd {
+	if action.RangeEnd != v.RangeEnd {
 		return false
 	}
 	return true
 }
 
 // Equal put action
-func (a EtcdActionPut) Equal(b EtcdActionInterface) bool {
+func (action EtcdActionPut) Equal(b EtcdActionInterface) bool {
 	v, ok := b.(EtcdActionPut)
 	if !ok {
 		return false
 	}
-	if a.Key != v.Key {
+	if action.Key != v.Key {
 		return false
 	}
-	if a.Value != v.Value {
+	if action.Value != v.Value {
 		return false
 	}
 	return true
