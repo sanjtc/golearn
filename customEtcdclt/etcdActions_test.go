@@ -59,8 +59,8 @@ func TestActionExec(t *testing.T) {
 	}
 
 	validDeleteActions := []EtcdActionDelete{
-		EtcdActionDelete{EtcdActDelete, "key1", ""},
-		EtcdActionDelete{EtcdActDelete, "key1", "endRange"},
+		{EtcdActDelete, "key1", ""},
+		{EtcdActDelete, "key1", "endRange"},
 	}
 	for _, action := range validDeleteActions {
 		_, err := action.Exec()

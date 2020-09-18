@@ -134,7 +134,7 @@ func (action EtcdActionGet) Exec() ([]string, error) {
 
 	const TWO = 2
 
-	result := make([]string, getResp.Count*2)
+	result := make([]string, getResp.Count*TWO)
 	for i, elem := range getResp.Kvs {
 		result[i*2] = string(elem.Key)
 		result[i*2+1] = string(elem.Value)
