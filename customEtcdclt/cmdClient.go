@@ -1,22 +1,28 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+)
 
-// ParseCommand parse command and execute
+const (
+	argc2 = 2
+	argc3 = 3
+)
+
+// ParseCommand parse command and execute.
 func ParseCommand(argv []string) {
 	action := parseCmdAction(argv)
 	if action == nil {
 		return
 	}
 
-	msgs, err := action.Exec()
-
-	if err != nil {
+	if msgs, err := action.Exec(); err != nil {
 		fmt.Println(err)
 		return
-	}
-	for _, msg := range msgs {
-		fmt.Println(msg)
+	} else {
+		for _, msg := range msgs {
+			fmt.Println(msg)
+		}
 	}
 }
 
@@ -24,6 +30,7 @@ func parseCmdAction(argv []string) EtcdActionInterface {
 	if argc := len(argv); argc == 0 {
 		return nil
 	}
+
 	command := argv[0]
 	switch command {
 	case "get":
@@ -38,28 +45,39 @@ func parseCmdAction(argv []string) EtcdActionInterface {
 }
 
 func parseCmdGetAction(argv []string) EtcdActionInterface {
-	if argc := len(argv); argc < 2 {
-		return EtcdActionGet{EtcdActionBase{EtcdActGet}, "", ""}
-	} else if argc > 2 {
-		return EtcdActionGet{EtcdActionBase{EtcdActGet}, argv[1], argv[2]}
-	} else {
-		return EtcdActionGet{EtcdActionBase{EtcdActGet}, argv[1], ""}
+	argc := len(argv)
+
+	switch {
+	case argc < argc2:
+		return EtcdActionGet{EtcdActGet, "", ""}
+	case argc == argc2:
+		return EtcdActionGet{EtcdActGet, argv[1], ""}
+	case argc > argc2:
+		return EtcdActionGet{EtcdActGet, argv[1], argv[2]}
+	default:
+		return EtcdActionGet{EtcdActGet, "", ""}
 	}
 }
 
 func parseCmdPutAction(argv []string) EtcdActionInterface {
-	if argc := len(argv); argc < 3 {
-		return EtcdActionPut{EtcdActionBase{EtcdActPut}, "", ""}
+	if argc := len(argv); argc < argc3 {
+		return EtcdActionPut{EtcdActPut, "", ""}
 	}
-	return EtcdActionPut{EtcdActionBase{EtcdActPut}, argv[1], argv[2]}
+
+	return EtcdActionPut{EtcdActPut, argv[1], argv[2]}
 }
 
 func parseCmdDeleteAction(argv []string) EtcdActionInterface {
-	if argc := len(argv); argc < 2 {
-		return EtcdActionDelete{EtcdActionBase{EtcdActDelete}, "", ""}
-	} else if argc > 2 {
-		return EtcdActionDelete{EtcdActionBase{EtcdActDelete}, argv[1], argv[2]}
-	} else {
-		return EtcdActionDelete{EtcdActionBase{EtcdActDelete}, argv[1], ""}
+	argc := len(argv)
+
+	switch {
+	case argc < argc2:
+		return EtcdActionDelete{EtcdActDelete, "", ""}
+	case argc == argc2:
+		return EtcdActionDelete{EtcdActDelete, argv[1], ""}
+	case argc > argc2:
+		return EtcdActionDelete{EtcdActDelete, argv[1], argv[2]}
+	default:
+		return EtcdActionDelete{EtcdActDelete, "", ""}
 	}
 }

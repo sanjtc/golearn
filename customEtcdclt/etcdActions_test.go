@@ -6,9 +6,9 @@ import (
 
 func TestActionExec(t *testing.T) {
 	invalidPutActions := []EtcdActionPut{
-		EtcdActionPut{EtcdActionBase{EtcdActPut}, "", ""},
-		EtcdActionPut{EtcdActionBase{EtcdActPut}, "key1", ""},
-		EtcdActionPut{EtcdActionBase{EtcdActPut}, "", "val1"},
+		{EtcdActPut, "", ""},
+		{EtcdActPut, "key1", ""},
+		{EtcdActPut, "", "val1"},
 	}
 	for _, action := range invalidPutActions {
 		_, err := action.Exec()
@@ -16,8 +16,9 @@ func TestActionExec(t *testing.T) {
 			t.Errorf("invalid put actions get no error")
 		}
 	}
+
 	validPutActions := []EtcdActionPut{
-		EtcdActionPut{EtcdActionBase{EtcdActPut}, "key1", "val1"},
+		{EtcdActPut, "key1", "val1"},
 	}
 	for _, action := range validPutActions {
 		_, err := action.Exec()
@@ -27,7 +28,7 @@ func TestActionExec(t *testing.T) {
 	}
 
 	invalidGetActions := []EtcdActionGet{
-		EtcdActionGet{EtcdActionBase{EtcdActGet}, "", ""},
+		{EtcdActGet, "", ""},
 	}
 	for _, action := range invalidGetActions {
 		_, err := action.Exec()
@@ -35,9 +36,10 @@ func TestActionExec(t *testing.T) {
 			t.Errorf("invalid get actions get no error")
 		}
 	}
+
 	validGetActions := []EtcdActionGet{
-		EtcdActionGet{EtcdActionBase{EtcdActGet}, "key1", ""},
-		EtcdActionGet{EtcdActionBase{EtcdActGet}, "key1", "endRange"},
+		{EtcdActGet, "key1", ""},
+		{EtcdActGet, "key1", "endRange"},
 	}
 	for _, action := range validGetActions {
 		_, err := action.Exec()
@@ -47,7 +49,7 @@ func TestActionExec(t *testing.T) {
 	}
 
 	invalidDeleteActions := []EtcdActionDelete{
-		EtcdActionDelete{EtcdActionBase{EtcdActDelete}, "", ""},
+		{EtcdActDelete, "", ""},
 	}
 	for _, action := range invalidDeleteActions {
 		_, err := action.Exec()
@@ -55,9 +57,10 @@ func TestActionExec(t *testing.T) {
 			t.Errorf("invalid get actions get no error")
 		}
 	}
+
 	validDeleteActions := []EtcdActionDelete{
-		EtcdActionDelete{EtcdActionBase{EtcdActDelete}, "key1", ""},
-		EtcdActionDelete{EtcdActionBase{EtcdActDelete}, "key1", "endRange"},
+		EtcdActionDelete{EtcdActDelete, "key1", ""},
+		EtcdActionDelete{EtcdActDelete, "key1", "endRange"},
 	}
 	for _, action := range validDeleteActions {
 		_, err := action.Exec()
