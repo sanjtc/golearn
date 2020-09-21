@@ -16,6 +16,8 @@ const (
 	EtcdActDelete = 3
 )
 
+const timeoutSecond = 5.0
+
 // EtcdActionInterface etcd action interface.
 type EtcdActionInterface interface {
 	Equal(EtcdActionInterface) bool
@@ -111,6 +113,15 @@ func (action EtcdActionPut) Equal(b EtcdActionInterface) bool {
 	return true
 }
 
+// func ExecuteAction(action EtcdActionInterface) ([]string, error) {
+// 	go func() {
+// 		<-context.Background().Done()
+
+// 	}()
+
+// 	return action.exec(context.Background())
+// }
+
 // Exec execute etcd get action.
 func (action EtcdActionGet) Exec() ([]string, error) {
 	if action.Key == "" {
@@ -127,8 +138,17 @@ func (action EtcdActionGet) Exec() ([]string, error) {
 		err     error
 	)
 
+	ctx, cancel := context.WithTimeout(context.Background(), timeoutSecond*time.Second)
+	defer cancel()
+
+	go func() {
+		<-ctx.Done()
+		log.Println("etcd no response")
+		client.Close()
+	}()
+
 	kv := clientv3.NewKV(client)
-	if getResp, err = kv.Get(context.TODO(), action.Key); err != nil {
+	if getResp, err = kv.Get(ctx, action.Key); err != nil {
 		return nil, err
 	}
 
@@ -155,7 +175,7 @@ func (action EtcdActionPut) Exec() ([]string, error) {
 	}
 
 	kv := clientv3.NewKV(client)
-	if _, err := kv.Put(context.TODO(), action.Key, action.Value); err != nil {
+	if _, err := kv.Put(context.Background(), action.Key, action.Value); err != nil {
 		return nil, err
 	}
 
@@ -179,7 +199,7 @@ func (action EtcdActionDelete) Exec() ([]string, error) {
 	)
 
 	kv := clientv3.NewKV(client)
-	if getResp, err = kv.Delete(context.TODO(), action.Key); err != nil {
+	if getResp, err = kv.Delete(context.Background(), action.Key); err != nil {
 		return nil, err
 	}
 
