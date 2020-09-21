@@ -11,9 +11,14 @@ require (
 	github.com/golang/protobuf v1.4.2 // indirect
 	github.com/google/uuid v1.1.2 // indirect
 	github.com/pantskun/golearn/customEtcdclt v0.0.0-20200917025114-8472437308fb // indirect
+	go.uber.org/multierr v1.6.0 // indirect
 	go.uber.org/zap v1.16.0 // indirect
-	google.golang.org/genproto v0.0.0-20200917134801-bb4cff56e0d0 // indirect
+	golang.org/x/net v0.0.0-20200904194848-62affa334b73 // indirect
+	golang.org/x/sys v0.0.0-20200918174421-af09f7315aff // indirect
+	golang.org/x/text v0.3.3 // indirect
+	google.golang.org/genproto v0.0.0-20200918140846-d0d605568037 // indirect
 	google.golang.org/grpc v1.32.0 // indirect
+	google.golang.org/protobuf v1.25.0 // indirect
 )
 
 replace google.golang.org/grpc => google.golang.org/grpc v1.26.0
