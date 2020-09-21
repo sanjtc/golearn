@@ -133,11 +133,6 @@ func (action EtcdActionGet) Exec() ([]string, error) {
 		return nil, EtcdError{"can not connect to etcd"}
 	}
 
-	var (
-		getResp *clientv3.GetResponse
-		err     error
-	)
-
 	ctx, cancel := context.WithTimeout(context.Background(), timeoutSecond*time.Second)
 	defer cancel()
 
@@ -147,8 +142,13 @@ func (action EtcdActionGet) Exec() ([]string, error) {
 		client.Close()
 	}()
 
+	var (
+		getResp *clientv3.GetResponse
+		err     error
+	)
+
 	kv := clientv3.NewKV(client)
-	if getResp, err = kv.Get(ctx, action.Key); err != nil {
+	if getResp, err = kv.Get(context.TODO(), action.Key); err != nil {
 		return nil, err
 	}
 
@@ -174,6 +174,15 @@ func (action EtcdActionPut) Exec() ([]string, error) {
 		return nil, EtcdError{"can not connect to etcd"}
 	}
 
+	ctx, cancel := context.WithTimeout(context.Background(), timeoutSecond*time.Second)
+	defer cancel()
+
+	go func() {
+		<-ctx.Done()
+		log.Println("etcd no response")
+		client.Close()
+	}()
+
 	kv := clientv3.NewKV(client)
 	if _, err := kv.Put(context.Background(), action.Key, action.Value); err != nil {
 		return nil, err
@@ -192,6 +201,15 @@ func (action EtcdActionDelete) Exec() ([]string, error) {
 	if client == nil {
 		return nil, EtcdError{"can not connect to etcd"}
 	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), timeoutSecond*time.Second)
+	defer cancel()
+
+	go func() {
+		<-ctx.Done()
+		log.Println("etcd no response")
+		client.Close()
+	}()
 
 	var (
 		getResp *clientv3.DeleteResponse
