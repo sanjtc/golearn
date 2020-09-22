@@ -30,8 +30,6 @@ func ParseEtcdClientConfig(filePath string) clientv3.Config {
 		return defaultConfig
 	}
 
-	log.Println(string(fb))
-
 	type EtcdConfigs struct {
 		Endpoint    string
 		DialTimeout time.Duration
