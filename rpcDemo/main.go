@@ -28,16 +28,17 @@ type Repository struct {
 	consignments []*pb.Consignment
 }
 
-// Create a new consignment
+// Create a new consignment.
 func (repo *Repository) Create(consignment *pb.Consignment) (*pb.Consignment, error) {
 	repo.mu.Lock()
 	updated := append(repo.consignments, consignment)
 	repo.consignments = updated
 	repo.mu.Unlock()
+
 	return consignment, nil
 }
 
-// GetAll consignments
+// GetAll consignments.
 func (repo *Repository) GetAll() []*pb.Consignment {
 	return repo.consignments
 }
@@ -54,7 +55,6 @@ type service struct {
 // which is a create method, which takes a context and a request as an
 // argument, these are handled by the gRPC server.
 func (s *service) CreateConsignment(ctx context.Context, req *pb.Consignment) (*pb.Response, error) {
-
 	// Save our consignment
 	consignment, err := s.repo.Create(req)
 	if err != nil {

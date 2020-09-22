@@ -1,0 +1,15 @@
+{
+	"stringVal": "stringval",
+	"bytesVal": "AAAB",
+	"embeddedExample": {
+		"int32Val": 1,
+		"stringVal": "embeddedStringval"
+	},
+	"repeatedInt32Val": [
+		2
+	],
+	"repeatedStringVal": [
+		"repeatedStringValue"
+	],
+	"TestOneof": null
+}
