@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"io/ioutil"
 	"net/http/httptest"
 	"testing"
@@ -28,6 +29,7 @@ func TestGetActionHandler(t *testing.T) {
 	}
 	for _, putCase := range putCases {
 		r.URL.RawQuery = putCase.query
+		r.Body = ioutil.NopCloser(bytes.NewBufferString(putCase.query))
 		PutActionHandler(w, r)
 
 		body, _ := ioutil.ReadAll(w.Body)
@@ -46,6 +48,7 @@ func TestGetActionHandler(t *testing.T) {
 	}
 	for _, getCase := range getCases {
 		r.URL.RawQuery = getCase.query
+		r.Body = ioutil.NopCloser(bytes.NewBufferString(getCase.query))
 		GetActionHandler(w, r)
 
 		body, _ := ioutil.ReadAll(w.Body)
@@ -62,6 +65,7 @@ func TestGetActionHandler(t *testing.T) {
 	}
 	for _, delCase := range delCases {
 		r.URL.RawQuery = delCase.query
+		r.Body = ioutil.NopCloser(bytes.NewBufferString(delCase.query))
 		DeleteActionHandler(w, r)
 
 		body, _ := ioutil.ReadAll(w.Body)

@@ -62,15 +62,7 @@ func (e EtcdError) Error() string {
 // Equal get action.
 func (action EtcdActionGet) Equal(b EtcdActionInterface) bool {
 	v, ok := b.(EtcdActionGet)
-	if !ok {
-		return false
-	}
-
-	if action.Key != v.Key {
-		return false
-	}
-
-	if action.RangeEnd != v.RangeEnd {
+	if !ok || action.Key != v.Key || action.RangeEnd != v.RangeEnd {
 		return false
 	}
 
@@ -80,15 +72,7 @@ func (action EtcdActionGet) Equal(b EtcdActionInterface) bool {
 // Equal delete action.
 func (action EtcdActionDelete) Equal(b EtcdActionInterface) bool {
 	v, ok := b.(EtcdActionDelete)
-	if !ok {
-		return false
-	}
-
-	if action.Key != v.Key {
-		return false
-	}
-
-	if action.RangeEnd != v.RangeEnd {
+	if !ok || action.Key != v.Key || action.RangeEnd != v.RangeEnd {
 		return false
 	}
 
@@ -98,29 +82,12 @@ func (action EtcdActionDelete) Equal(b EtcdActionInterface) bool {
 // Equal put action.
 func (action EtcdActionPut) Equal(b EtcdActionInterface) bool {
 	v, ok := b.(EtcdActionPut)
-	if !ok {
-		return false
-	}
-
-	if action.Key != v.Key {
-		return false
-	}
-
-	if action.Value != v.Value {
+	if !ok || action.Key != v.Key || action.Value != v.Value {
 		return false
 	}
 
 	return true
 }
-
-// func ExecuteAction(action EtcdActionInterface) ([]string, error) {
-// 	go func() {
-// 		<-context.Background().Done()
-
-// 	}()
-
-// 	return action.exec(context.Background())
-// }
 
 // Exec execute etcd get action.
 func (action EtcdActionGet) Exec() ([]string, error) {
@@ -208,12 +175,7 @@ func (action EtcdActionDelete) Exec() ([]string, error) {
 
 // ConnectEtcd return etcd client.
 func ConnectEtcd() *clientv3.Client {
-	const timeSecond = 5.0
-
-	var config clientv3.Config = clientv3.Config{
-		Endpoints:   []string{"127.0.0.1:2379"},
-		DialTimeout: timeSecond * time.Second,
-	}
+	config := ParseEtcdClientConfig("etcdClientConfig.json")
 
 	var (
 		client *clientv3.Client
