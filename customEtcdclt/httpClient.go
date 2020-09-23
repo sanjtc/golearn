@@ -55,9 +55,9 @@ func startHTTPListen(addr string, ctx context.Context) {
 		server.Close()
 	}()
 
-	http.HandleFunc("/get", GetActionHandler)
-	http.HandleFunc("/put", PutActionHandler)
-	http.HandleFunc("/del", DeleteActionHandler)
+	http.HandleFunc("/get", getRequestHandler)
+	http.HandleFunc("/put", putRequestHandler)
+	http.HandleFunc("/del", deleteRequestHandler)
 
 	fmt.Println("start listen to ", addr)
 
@@ -66,44 +66,52 @@ func startHTTPListen(addr string, ctx context.Context) {
 	}
 }
 
-// GetActionHandler handle get action.
-func GetActionHandler(w http.ResponseWriter, r *http.Request) {
-	// query := r.URL.Query()
+func getRequestHandler(w http.ResponseWriter, r *http.Request) {
+	action := parseGetRequest(r)
+	msg, err := action.Exec(GetEtcdClient())
+	writeResponse(msg, err, w)
+}
+
+func putRequestHandler(w http.ResponseWriter, r *http.Request) {
+	action := parsePutRequest(r)
+	msg, err := action.Exec(GetEtcdClient())
+	writeResponse(msg, err, w)
+}
+
+func deleteRequestHandler(w http.ResponseWriter, r *http.Request) {
+	action := parseDeleteRequest(r)
+	msg, err := action.Exec(GetEtcdClient())
+	writeResponse(msg, err, w)
+}
+
+func parseGetRequest(r *http.Request) EtcdActionInterface {
 	body, _ := ioutil.ReadAll(r.Body)
 	query, _ := url.ParseQuery(string(body))
 	key := query.Get("key")
 	rangeEnd := query.Get("rangeEnd")
 
-	action := EtcdActionGet{EtcdActGet, key, rangeEnd}
-	ExecEtcdAction(action, w)
+	return &EtcdActionGet{EtcdActGet, key, rangeEnd}
 }
 
-// PutActionHandler handle put action.
-func PutActionHandler(w http.ResponseWriter, r *http.Request) {
-	// query := r.URL.Query()
+func parsePutRequest(r *http.Request) EtcdActionInterface {
 	body, _ := ioutil.ReadAll(r.Body)
 	query, _ := url.ParseQuery(string(body))
 	key := query.Get("key")
 	value := query.Get("value")
-	action := EtcdActionPut{EtcdActPut, key, value}
-	ExecEtcdAction(action, w)
+
+	return &EtcdActionPut{EtcdActPut, key, value}
 }
 
-// DeleteActionHandler handle delete action.
-func DeleteActionHandler(w http.ResponseWriter, r *http.Request) {
-	// query := r.URL.Query()
+func parseDeleteRequest(r *http.Request) EtcdActionInterface {
 	body, _ := ioutil.ReadAll(r.Body)
 	query, _ := url.ParseQuery(string(body))
 	key := query.Get("key")
 	rangeEnd := query.Get("rangeEnd")
 
-	action := EtcdActionDelete{EtcdActDelete, key, rangeEnd}
-	ExecEtcdAction(action, w)
+	return &EtcdActionDelete{EtcdActDelete, key, rangeEnd}
 }
 
-// ExecEtcdAction exec etcd action and write response.
-func ExecEtcdAction(action EtcdActionInterface, w http.ResponseWriter) {
-	msgs, err := action.Exec()
+func writeResponse(msgs []string, err error, w http.ResponseWriter) {
 	if err != nil {
 		_, _ = w.Write([]byte(err.Error() + "\n"))
 		return

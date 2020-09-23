@@ -4,12 +4,12 @@ import (
 	"testing"
 )
 
-type cmdTestInfo struct {
-	cmd    []string
-	action EtcdActionInterface
-}
-
 func TestParseCmdAction(t *testing.T) {
+	type cmdTestInfo struct {
+		cmd    []string
+		action EtcdActionInterface
+	}
+
 	noneCmd := make([]string, 0)
 	cmdCases := []cmdTestInfo{
 		{noneCmd, nil},

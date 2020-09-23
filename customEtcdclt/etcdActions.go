@@ -21,13 +21,8 @@ const timeoutSecond = 5.0
 // EtcdActionInterface etcd action interface.
 type EtcdActionInterface interface {
 	Equal(EtcdActionInterface) bool
-	Exec() ([]string, error)
+	Exec(client *clientv3.Client) ([]string, error)
 }
-
-// EtcdActionBase base etcd action
-// type EtcdActionBase struct {
-// 	ActionType int
-// }
 
 // EtcdActionGet etcd get action info.
 type EtcdActionGet struct {
@@ -90,12 +85,11 @@ func (action EtcdActionPut) Equal(b EtcdActionInterface) bool {
 }
 
 // Exec execute etcd get action.
-func (action EtcdActionGet) Exec() ([]string, error) {
+func (action EtcdActionGet) Exec(client *clientv3.Client) ([]string, error) {
 	if action.Key == "" {
 		return nil, EtcdError{"get command needs one argument as key and an optional argument as range_end"}
 	}
 
-	client := ConnectEtcd()
 	if client == nil {
 		return nil, EtcdError{"can not connect to etcd"}
 	}
@@ -108,8 +102,7 @@ func (action EtcdActionGet) Exec() ([]string, error) {
 		err     error
 	)
 
-	kv := clientv3.NewKV(client)
-	if getResp, err = kv.Get(ctx, action.Key); err != nil {
+	if getResp, err = client.Get(ctx, action.Key); err != nil {
 		return nil, err
 	}
 
@@ -125,12 +118,11 @@ func (action EtcdActionGet) Exec() ([]string, error) {
 }
 
 // Exec execute etcd put action.
-func (action EtcdActionPut) Exec() ([]string, error) {
+func (action EtcdActionPut) Exec(client *clientv3.Client) ([]string, error) {
 	if action.Key == "" || action.Value == "" {
 		return nil, EtcdError{"put command needs 2 arguments"}
 	}
 
-	client := ConnectEtcd()
 	if client == nil {
 		return nil, EtcdError{"can not connect to etcd"}
 	}
@@ -138,8 +130,7 @@ func (action EtcdActionPut) Exec() ([]string, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), timeoutSecond*time.Second)
 	defer cancel()
 
-	kv := clientv3.NewKV(client)
-	if _, err := kv.Put(ctx, action.Key, action.Value); err != nil {
+	if _, err := client.Put(ctx, action.Key, action.Value); err != nil {
 		return nil, err
 	}
 
@@ -147,12 +138,11 @@ func (action EtcdActionPut) Exec() ([]string, error) {
 }
 
 // Exec execute etcd delete action.
-func (action EtcdActionDelete) Exec() ([]string, error) {
+func (action EtcdActionDelete) Exec(client *clientv3.Client) ([]string, error) {
 	if action.Key == "" {
 		return nil, EtcdError{"del command needs one argument as key and an optional argument as range_end"}
 	}
 
-	client := ConnectEtcd()
 	if client == nil {
 		return nil, EtcdError{"can not connect to etcd"}
 	}
@@ -165,16 +155,15 @@ func (action EtcdActionDelete) Exec() ([]string, error) {
 		err     error
 	)
 
-	kv := clientv3.NewKV(client)
-	if getResp, err = kv.Delete(ctx, action.Key); err != nil {
+	if getResp, err = client.Delete(ctx, action.Key); err != nil {
 		return nil, err
 	}
 
 	return []string{strconv.FormatInt(getResp.Deleted, 10)}, nil
 }
 
-// ConnectEtcd return etcd client.
-func ConnectEtcd() *clientv3.Client {
+// GetEtcdClient return etcd client.
+func GetEtcdClient() *clientv3.Client {
 	config := ParseEtcdClientConfig("etcdClientConfig.json")
 
 	var (

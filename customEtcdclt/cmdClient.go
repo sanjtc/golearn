@@ -16,7 +16,7 @@ func ParseCommand(argv []string) {
 		return
 	}
 
-	if msgs, err := action.Exec(); err != nil {
+	if msgs, err := action.Exec(GetEtcdClient()); err != nil {
 		fmt.Println(err)
 		return
 	} else {
@@ -54,9 +54,9 @@ func parseCmdGetAction(argv []string) EtcdActionInterface {
 		return EtcdActionGet{EtcdActGet, argv[1], ""}
 	case argc > argc2:
 		return EtcdActionGet{EtcdActGet, argv[1], argv[2]}
-	default:
-		return EtcdActionGet{EtcdActGet, "", ""}
 	}
+
+	return EtcdActionGet{EtcdActGet, "", ""}
 }
 
 func parseCmdPutAction(argv []string) EtcdActionInterface {
@@ -77,7 +77,7 @@ func parseCmdDeleteAction(argv []string) EtcdActionInterface {
 		return EtcdActionDelete{EtcdActDelete, argv[1], ""}
 	case argc > argc2:
 		return EtcdActionDelete{EtcdActDelete, argv[1], argv[2]}
-	default:
-		return EtcdActionDelete{EtcdActDelete, "", ""}
 	}
+
+	return EtcdActionDelete{EtcdActDelete, "", ""}
 }

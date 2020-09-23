@@ -7,70 +7,87 @@ import (
 	"testing"
 )
 
-type httpTestInfo struct {
-	query  string
-	result string
-}
+// const (
+// 	putErrMsg = "put command needs 2 arguments\n"
+// 	getErrMsg = "get command needs one argument as key and an optional argument as range_end\n"
+// 	delErrMsg = "del command needs one argument as key and an optional argument as range_end\n"
+// )
 
-const (
-	putErrMsg = "put command needs 2 arguments\n"
-	getErrMsg = "get command needs one argument as key and an optional argument as range_end\n"
-	delErrMsg = "del command needs one argument as key and an optional argument as range_end\n"
-)
-
-func TestGetActionHandler(t *testing.T) {
-	w := httptest.NewRecorder()
-	r := httptest.NewRequest("GET", "http://localhost:8080/put", nil)
-
-	putCases := []httpTestInfo{
-		{"", putErrMsg},
-		{"key=key1", putErrMsg},
-		{"key=key1&value=value1", "OK\n"},
+func TestParseRequest(t *testing.T) {
+	type httpTestInfo struct {
+		query          string
+		expectedAction EtcdActionInterface
 	}
+
+	r := httptest.NewRequest("GET", "http://localhost:8080/put", nil)
+	putCases := []httpTestInfo{
+		{"", EtcdActionPut{EtcdActPut, "", ""}},
+		{"key=key", EtcdActionPut{EtcdActPut, "key", ""}},
+		{"key=key&value=value", EtcdActionPut{EtcdActPut, "key", "value"}},
+	}
+
 	for _, putCase := range putCases {
-		r.URL.RawQuery = putCase.query
 		r.Body = ioutil.NopCloser(bytes.NewBufferString(putCase.query))
-		PutActionHandler(w, r)
 
-		body, _ := ioutil.ReadAll(w.Body)
-
-		bodystr := string(body)
-		if bodystr != putCase.result {
-			t.Errorf("expect: %s, get: %s", putCase.result, bodystr)
+		action := parsePutRequest(r)
+		if !action.Equal(putCase.expectedAction) {
+			t.Errorf("expect: %s, get: %s", putCase.expectedAction, action)
 		}
 	}
 
 	r = httptest.NewRequest("GET", "http://localhost:8080/get", nil)
-
 	getCases := []httpTestInfo{
-		{"", getErrMsg},
-		{"key=key1", "key1\nvalue1\n"},
+		{"", EtcdActionGet{EtcdActGet, "", ""}},
+		{"key=key", EtcdActionGet{EtcdActGet, "key", ""}},
 	}
-	for _, getCase := range getCases {
-		r.URL.RawQuery = getCase.query
-		r.Body = ioutil.NopCloser(bytes.NewBufferString(getCase.query))
-		GetActionHandler(w, r)
 
-		body, _ := ioutil.ReadAll(w.Body)
-		if string(body) != getCase.result {
-			t.Errorf("expect: %s, get: %s", getCase.result, string(body))
+	for _, getCase := range getCases {
+		r.Body = ioutil.NopCloser(bytes.NewBufferString(getCase.query))
+
+		action := parseGetRequest(r)
+		if !action.Equal(getCase.expectedAction) {
+			t.Errorf("expect: %s, get: %s", getCase.expectedAction, action)
 		}
 	}
 
 	r = httptest.NewRequest("GET", "http://localhost:8080/del", nil)
-
 	delCases := []httpTestInfo{
-		{"", delErrMsg},
-		{"key=key1", "1\n"},
+		{"", EtcdActionDelete{EtcdActDelete, "", ""}},
+		{"key=key", EtcdActionDelete{EtcdActDelete, "key", ""}},
 	}
+
 	for _, delCase := range delCases {
-		r.URL.RawQuery = delCase.query
 		r.Body = ioutil.NopCloser(bytes.NewBufferString(delCase.query))
-		DeleteActionHandler(w, r)
+
+		action := parseDeleteRequest(r)
+		if !action.Equal(delCase.expectedAction) {
+			t.Errorf("expect: %s, get: %s", delCase.expectedAction, action)
+		}
+	}
+}
+
+func TestWriteResponse(t *testing.T) {
+	type writeTestInfo struct {
+		msgs     []string
+		err      error
+		expected string
+	}
+
+	w := httptest.NewRecorder()
+
+	writeCases := []writeTestInfo{
+		{nil, EtcdError{"test"}, "test\n"},
+		{[]string{"test1", "test2"}, nil, "test1\ntest2\n"},
+	}
+
+	for _, writeCase := range writeCases {
+		writeResponse(writeCase.msgs, writeCase.err, w)
 
 		body, _ := ioutil.ReadAll(w.Body)
-		if string(body) != delCase.result {
-			t.Errorf("expect: %s, get: %s", delCase.result, string(body))
+		bodystr := string(body)
+
+		if bodystr != writeCase.expected {
+			t.Errorf("expect: %s, get: %s", writeCase.expected, bodystr)
 		}
 	}
 }
