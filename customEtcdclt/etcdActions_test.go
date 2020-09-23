@@ -1,9 +1,11 @@
 package main
 
 import (
+	"io/ioutil"
+	"os"
 	"testing"
 
-	"github.com/coreos/etcd/embed"
+	embedEtcd "github.com/coreos/etcd/embed"
 )
 
 func TestActionExec(t *testing.T) {
@@ -73,5 +75,11 @@ func TestActionExec(t *testing.T) {
 }
 
 func TestEmbedEtcd(t *testing.T) {
-	embed.StartEtcd()
+	tdir, err := ioutil.TempDir(os.TempDir(), "auth-test")
+	if err != nil {
+		t.Fatal(err)
+	}
+	cfg := embedEtcd.NewConfig()
+	cfg.Dir = tdir
+	embedEtcd.StartEtcd(cfg)
 }
