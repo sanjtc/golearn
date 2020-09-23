@@ -1,11 +1,7 @@
 package main
 
 import (
-	"io/ioutil"
-	"os"
 	"testing"
-
-	embedEtcd "github.com/coreos/etcd/embed"
 )
 
 func TestActionExec(t *testing.T) {
@@ -74,12 +70,23 @@ func TestActionExec(t *testing.T) {
 	}
 }
 
-func TestEmbedEtcd(t *testing.T) {
-	tdir, err := ioutil.TempDir(os.TempDir(), "auth-test")
-	if err != nil {
-		t.Fatal(err)
-	}
-	cfg := embedEtcd.NewConfig()
-	cfg.Dir = tdir
-	embedEtcd.StartEtcd(cfg)
-}
+// func TestEmbedEtcd(t *testing.T) {
+// 	tdir, err := ioutil.TempDir(os.TempDir(), "auth-test")
+// 	if err != nil {
+// 		t.Fatal(err)
+// 	}
+// 	cfg := embed.NewConfig()
+// 	cfg.Dir = tdir
+// 	e, err := embed.StartEtcd(cfg)
+// 	if err != nil {
+// 		t.Fatal(err)
+// 	}
+// 	defer e.Close()
+// 	client := v3client.New(e.Server)
+// 	defer client.Close()
+
+// 	_, err = client.RoleAdd(context.TODO(), "root")
+// 	if err != nil {
+// 		t.Fatal(err)
+// 	}
+// }

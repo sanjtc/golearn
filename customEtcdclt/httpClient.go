@@ -35,16 +35,14 @@ func HTTPClient(addr string) {
 		ss := make(chan os.Signal, 1)
 		signal.Notify(ss, syscall.SIGINT, syscall.SIGTERM)
 
-		for {
-			select {
-			case <-ctx.Done():
-				return
-			case s := <-ss:
-				fmt.Println("got signal:", s)
-				cancel()
+		select {
+		case <-ctx.Done():
+			return
+		case s := <-ss:
+			fmt.Println("got signal:", s)
+			cancel()
 
-				return
-			}
+			return
 		}
 	}()
 }
