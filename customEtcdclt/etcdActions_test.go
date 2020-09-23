@@ -2,6 +2,8 @@ package main
 
 import (
 	"testing"
+
+	"github.com/coreos/etcd/embed"
 )
 
 func TestActionExec(t *testing.T) {
@@ -68,4 +70,8 @@ func TestActionExec(t *testing.T) {
 			t.Errorf("valid get actions get error")
 		}
 	}
+}
+
+func TestEmbedEtcd(t *testing.T) {
+	embed.StartEtcd()
 }

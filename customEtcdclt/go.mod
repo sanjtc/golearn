@@ -1,4 +1,4 @@
-module golearn/customEtcdclt
+module github.com/pantskun/golearn/customEtcdclt
 
 go 1.14
 
@@ -10,7 +10,6 @@ require (
 	github.com/gogo/protobuf v1.3.1 // indirect
 	github.com/golang/protobuf v1.4.2 // indirect
 	github.com/google/uuid v1.1.2 // indirect
-	github.com/pantskun/golearn/customEtcdclt v0.0.0-20200917025114-8472437308fb // indirect
 	go.uber.org/multierr v1.6.0 // indirect
 	go.uber.org/zap v1.16.0 // indirect
 	golang.org/x/net v0.0.0-20200904194848-62affa334b73 // indirect
