@@ -26,11 +26,11 @@ require (
 	go.etcd.io/bbolt v1.3.5 // indirect
 	go.uber.org/multierr v1.6.0 // indirect
 	go.uber.org/zap v1.16.0 // indirect
-	golang.org/x/net v0.0.0-20200904194848-62affa334b73 // indirect
-	golang.org/x/sys v0.0.0-20200922070232-aee5d888a860 // indirect
+	golang.org/x/net v0.0.0-20200923182212-328152dc79b1 // indirect
+	golang.org/x/sys v0.0.0-20200923182605-d9f96fdee20d // indirect
 	golang.org/x/text v0.3.3 // indirect
 	golang.org/x/time v0.0.0-20200630173020-3af7569d3a1e // indirect
-	google.golang.org/genproto v0.0.0-20200921165018-b9da36f5f452 // indirect
+	google.golang.org/genproto v0.0.0-20200923140941-5646d36feee1 // indirect
 	google.golang.org/protobuf v1.25.0 // indirect
 	sigs.k8s.io/yaml v1.2.0 // indirect
 )

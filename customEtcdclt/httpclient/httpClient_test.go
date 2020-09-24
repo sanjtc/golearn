@@ -23,9 +23,9 @@ func TestParseRequest(t *testing.T) {
 
 	r := httptest.NewRequest("GET", "http://localhost:8080/put", nil)
 	putCases := []httpTestInfo{
-		{"", etcdinteraction.EtcdActionPut{ActionType: etcdinteraction.EtcdActPut, Key: "", Value: ""}},
-		{"key=key", etcdinteraction.EtcdActionPut{ActionType: etcdinteraction.EtcdActPut, Key: "key", Value: ""}},
-		{"key=key&value=value", etcdinteraction.EtcdActionPut{ActionType: etcdinteraction.EtcdActPut, Key: "key", Value: "value"}},
+		{"", etcdinteraction.NewPutAction("", "")},
+		{"key=key", etcdinteraction.NewPutAction("key", "")},
+		{"key=key&value=value", etcdinteraction.NewPutAction("key", "value")},
 	}
 
 	for _, putCase := range putCases {
@@ -39,8 +39,8 @@ func TestParseRequest(t *testing.T) {
 
 	r = httptest.NewRequest("GET", "http://localhost:8080/get", nil)
 	getCases := []httpTestInfo{
-		{"", etcdinteraction.EtcdActionGet{ActionType: etcdinteraction.EtcdActGet, Key: "", RangeEnd: ""}},
-		{"key=key", etcdinteraction.EtcdActionGet{ActionType: etcdinteraction.EtcdActGet, Key: "key", RangeEnd: ""}},
+		{"", etcdinteraction.NewGetAction("", "")},
+		{"key=key", etcdinteraction.NewGetAction("key", "")},
 	}
 
 	for _, getCase := range getCases {
@@ -54,8 +54,8 @@ func TestParseRequest(t *testing.T) {
 
 	r = httptest.NewRequest("GET", "http://localhost:8080/del", nil)
 	delCases := []httpTestInfo{
-		{"", etcdinteraction.EtcdActionDelete{ActionType: etcdinteraction.EtcdActDelete, Key: "", RangeEnd: ""}},
-		{"key=key", etcdinteraction.EtcdActionDelete{ActionType: etcdinteraction.EtcdActDelete, Key: "key", RangeEnd: ""}},
+		{"", etcdinteraction.NewDeleteAction("", "")},
+		{"key=key", etcdinteraction.NewDeleteAction("key", "")},
 	}
 
 	for _, delCase := range delCases {

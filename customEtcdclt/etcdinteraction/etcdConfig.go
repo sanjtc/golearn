@@ -10,7 +10,7 @@ import (
 	"github.com/coreos/etcd/clientv3"
 )
 
-func ParseEtcdClientConfig(filePath string) clientv3.Config {
+func GetEtcdClientConfig(filePath string) clientv3.Config {
 	const timeSecond = 5.0
 
 	defaultConfig := clientv3.Config{

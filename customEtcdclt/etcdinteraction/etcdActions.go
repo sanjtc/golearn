@@ -81,8 +81,8 @@ func (e EtcdError) Error() string {
 }
 
 // Equal get action.
-func (action EtcdActionGet) Equal(b EtcdActionInterface) bool {
-	v, ok := b.(EtcdActionGet)
+func (action *EtcdActionGet) Equal(b EtcdActionInterface) bool {
+	v, ok := b.(*EtcdActionGet)
 	if !ok || action.Key != v.Key || action.RangeEnd != v.RangeEnd {
 		return false
 	}
@@ -91,8 +91,8 @@ func (action EtcdActionGet) Equal(b EtcdActionInterface) bool {
 }
 
 // Equal delete action.
-func (action EtcdActionDelete) Equal(b EtcdActionInterface) bool {
-	v, ok := b.(EtcdActionDelete)
+func (action *EtcdActionDelete) Equal(b EtcdActionInterface) bool {
+	v, ok := b.(*EtcdActionDelete)
 	if !ok || action.Key != v.Key || action.RangeEnd != v.RangeEnd {
 		return false
 	}
@@ -101,8 +101,8 @@ func (action EtcdActionDelete) Equal(b EtcdActionInterface) bool {
 }
 
 // Equal put action.
-func (action EtcdActionPut) Equal(b EtcdActionInterface) bool {
-	v, ok := b.(EtcdActionPut)
+func (action *EtcdActionPut) Equal(b EtcdActionInterface) bool {
+	v, ok := b.(*EtcdActionPut)
 	if !ok || action.Key != v.Key || action.Value != v.Value {
 		return false
 	}
@@ -192,4 +192,20 @@ func (action EtcdActionDelete) Exec(client *clientv3.Client) ([]string, error) {
 func GetEtcdClient(config clientv3.Config) *clientv3.Client {
 	client, _ := clientv3.New(config)
 	return client
+}
+
+func ExecuteAction(action EtcdActionInterface, client *clientv3.Client) string {
+	if action == nil {
+		return "action is nil"
+	}
+
+	if msgs, err := action.Exec(client); err != nil {
+		return err.Error()
+	} else {
+		result := ""
+		for _, msg := range msgs {
+			result = result + msg + "\n"
+		}
+		return result
+	}
 }

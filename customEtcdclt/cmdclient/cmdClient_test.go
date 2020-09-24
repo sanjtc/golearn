@@ -8,8 +8,8 @@ import (
 
 func TestParseCmdAction(t *testing.T) {
 	type cmdTestInfo struct {
-		cmd    []string
-		action etcdinteraction.EtcdActionInterface
+		cmd      []string
+		expected etcdinteraction.EtcdActionInterface
 	}
 
 	noneCmd := make([]string, 0)
@@ -17,30 +17,30 @@ func TestParseCmdAction(t *testing.T) {
 		{noneCmd, nil},
 		{[]string{"other"}, nil},
 
-		{[]string{"get"}, etcdinteraction.EtcdActionGet{ActionType: etcdinteraction.EtcdActGet, Key: "", RangeEnd: ""}},
-		{[]string{"get", "key"}, etcdinteraction.EtcdActionGet{ActionType: etcdinteraction.EtcdActGet, Key: "key", RangeEnd: ""}},
-		{[]string{"get", "key", "rangeEnd"}, etcdinteraction.EtcdActionGet{ActionType: etcdinteraction.EtcdActGet, Key: "key", RangeEnd: "rangeEnd"}},
-		{[]string{"get", "key", "rangeEnd", "other"}, etcdinteraction.EtcdActionGet{ActionType: etcdinteraction.EtcdActGet, Key: "key", RangeEnd: "rangeEnd"}},
+		{[]string{"get"}, etcdinteraction.NewGetAction("", "")},
+		{[]string{"get", "key"}, etcdinteraction.NewGetAction("key", "")},
+		{[]string{"get", "key", "rangeEnd"}, etcdinteraction.NewGetAction("key", "rangeEnd")},
+		{[]string{"get", "key", "rangeEnd", "other"}, etcdinteraction.NewGetAction("key", "rangeEnd")},
 
-		{[]string{"put"}, etcdinteraction.EtcdActionPut{ActionType: etcdinteraction.EtcdActPut, Key: "", Value: ""}},
-		{[]string{"put", "key"}, etcdinteraction.EtcdActionPut{ActionType: etcdinteraction.EtcdActPut, Key: "", Value: ""}},
-		{[]string{"put", "key", "value"}, etcdinteraction.EtcdActionPut{ActionType: etcdinteraction.EtcdActPut, Key: "key", Value: "value"}},
-		{[]string{"put", "key", "value", "other"}, etcdinteraction.EtcdActionPut{ActionType: etcdinteraction.EtcdActPut, Key: "key", Value: "value"}},
+		{[]string{"put"}, etcdinteraction.NewPutAction("", "")},
+		{[]string{"put", "key"}, etcdinteraction.NewPutAction("key", "")},
+		{[]string{"put", "key", "value"}, etcdinteraction.NewPutAction("key", "value")},
+		{[]string{"put", "key", "value", "other"}, etcdinteraction.NewPutAction("key", "value")},
 
-		{[]string{"del"}, etcdinteraction.EtcdActionDelete{ActionType: etcdinteraction.EtcdActDelete, Key: "", RangeEnd: ""}},
-		{[]string{"del", "key"}, etcdinteraction.EtcdActionDelete{ActionType: etcdinteraction.EtcdActDelete, Key: "key", RangeEnd: ""}},
-		{[]string{"del", "key", "rangeEnd"}, etcdinteraction.EtcdActionDelete{ActionType: etcdinteraction.EtcdActDelete, Key: "key", RangeEnd: "rangeEnd"}},
-		{[]string{"del", "key", "rangeEnd", "other"}, etcdinteraction.EtcdActionDelete{ActionType: etcdinteraction.EtcdActDelete, Key: "key", RangeEnd: "rangeEnd"}},
+		{[]string{"del"}, etcdinteraction.NewDeleteAction("", "")},
+		{[]string{"del", "key"}, etcdinteraction.NewDeleteAction("key", "")},
+		{[]string{"del", "key", "rangeEnd"}, etcdinteraction.NewDeleteAction("key", "rangeEnd")},
+		{[]string{"del", "key", "rangeEnd", "other"}, etcdinteraction.NewDeleteAction("key", "rangeEnd")},
 	}
 
 	for _, cmdCase := range cmdCases {
 		action := parseCmdAction(cmdCase.cmd)
-		if action == nil && action != cmdCase.action {
-			t.Errorf("get unexpect action")
+		if action == nil && action != cmdCase.expected {
+			t.Error("get unexpect action")
 		}
 
-		if action != nil && !action.Equal(cmdCase.action) {
-			t.Errorf("get unexpect action")
+		if action != nil && !action.Equal(cmdCase.expected) {
+			t.Error("expected: ", cmdCase.expected, " got: ", action)
 		}
 	}
 }

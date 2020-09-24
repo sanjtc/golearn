@@ -1,6 +1,7 @@
 package cmdclient
 
 import (
+	"flag"
 	"fmt"
 
 	"github.com/pantskun/golearn/customEtcdclt/etcdinteraction"
@@ -8,26 +9,14 @@ import (
 
 const (
 	argc2 = 2
-	argc3 = 3
 )
 
-// ParseCommand parse command and execute.
-func ParseCommand(argv []string) error {
+func CMDClient() {
+	flag.Parse()
+	argv := flag.Args()
 	action := parseCmdAction(argv)
-	if action == nil {
-		return etcdinteraction.EtcdError{Msg: "action is nil"}
-	}
-
-	config := etcdinteraction.ParseEtcdClientConfig("../etcdClientConfig.json")
-	if msgs, err := action.Exec(etcdinteraction.GetEtcdClient(config)); err != nil {
-		fmt.Println(err)
-	} else {
-		for _, msg := range msgs {
-			fmt.Println(msg)
-		}
-	}
-
-	return nil
+	config := etcdinteraction.GetEtcdClientConfig("../etcdClientConfig.json")
+	fmt.Println(etcdinteraction.ExecuteAction(action, etcdinteraction.GetEtcdClient(config)))
 }
 
 func parseCmdAction(argv []string) etcdinteraction.EtcdActionInterface {
@@ -52,46 +41,25 @@ func parseCmdGetAction(argv []string) etcdinteraction.EtcdActionInterface {
 	argc := len(argv)
 
 	switch {
-	case argc < argc2:
-		return etcdinteraction.EtcdActionGet{
-			ActionType: etcdinteraction.EtcdActGet,
-			Key:        "",
-			RangeEnd:   "",
-		}
 	case argc == argc2:
-		return etcdinteraction.EtcdActionGet{
-			ActionType: etcdinteraction.EtcdActGet,
-			Key:        argv[1],
-			RangeEnd:   "",
-		}
+		return etcdinteraction.NewGetAction(argv[1], "")
 	case argc > argc2:
-		return etcdinteraction.EtcdActionGet{
-			ActionType: etcdinteraction.EtcdActGet,
-			Key:        argv[1],
-			RangeEnd:   argv[2],
-		}
-	}
-
-	return etcdinteraction.EtcdActionGet{
-		ActionType: etcdinteraction.EtcdActGet,
-		Key:        "",
-		RangeEnd:   "",
+		return etcdinteraction.NewGetAction(argv[1], argv[2])
+	default:
+		return etcdinteraction.NewGetAction("", "")
 	}
 }
 
 func parseCmdPutAction(argv []string) etcdinteraction.EtcdActionInterface {
-	if argc := len(argv); argc < argc3 {
-		return etcdinteraction.EtcdActionPut{
-			ActionType: etcdinteraction.EtcdActPut,
-			Key:        "",
-			Value:      "",
-		}
-	}
+	argc := len(argv)
 
-	return etcdinteraction.EtcdActionPut{
-		ActionType: etcdinteraction.EtcdActPut,
-		Key:        argv[1],
-		Value:      argv[2],
+	switch {
+	case argc == argc2:
+		return etcdinteraction.NewPutAction(argv[1], "")
+	case argc > argc2:
+		return etcdinteraction.NewPutAction(argv[1], argv[2])
+	default:
+		return etcdinteraction.NewPutAction("", "")
 	}
 }
 
@@ -99,29 +67,11 @@ func parseCmdDeleteAction(argv []string) etcdinteraction.EtcdActionInterface {
 	argc := len(argv)
 
 	switch {
-	case argc < argc2:
-		return etcdinteraction.EtcdActionDelete{
-			ActionType: etcdinteraction.EtcdActDelete,
-			Key:        "",
-			RangeEnd:   "",
-		}
 	case argc == argc2:
-		return etcdinteraction.EtcdActionDelete{
-			ActionType: etcdinteraction.EtcdActDelete,
-			Key:        argv[1],
-			RangeEnd:   "",
-		}
+		return etcdinteraction.NewDeleteAction(argv[1], "")
 	case argc > argc2:
-		return etcdinteraction.EtcdActionDelete{
-			ActionType: etcdinteraction.EtcdActDelete,
-			Key:        argv[1],
-			RangeEnd:   argv[2],
-		}
-	}
-
-	return etcdinteraction.EtcdActionDelete{
-		ActionType: etcdinteraction.EtcdActDelete,
-		Key:        "",
-		RangeEnd:   "",
+		return etcdinteraction.NewDeleteAction(argv[1], argv[2])
+	default:
+		return etcdinteraction.NewDeleteAction("", "")
 	}
 }
