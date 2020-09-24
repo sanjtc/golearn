@@ -1,10 +1,12 @@
-package main
+package httpclient
 
 import (
 	"bytes"
 	"io/ioutil"
 	"net/http/httptest"
 	"testing"
+
+	"github.com/pantskun/golearn/customEtcdclt/etcdinteraction"
 )
 
 // const (
@@ -16,14 +18,14 @@ import (
 func TestParseRequest(t *testing.T) {
 	type httpTestInfo struct {
 		query          string
-		expectedAction EtcdActionInterface
+		expectedAction etcdinteraction.EtcdActionInterface
 	}
 
 	r := httptest.NewRequest("GET", "http://localhost:8080/put", nil)
 	putCases := []httpTestInfo{
-		{"", EtcdActionPut{EtcdActPut, "", ""}},
-		{"key=key", EtcdActionPut{EtcdActPut, "key", ""}},
-		{"key=key&value=value", EtcdActionPut{EtcdActPut, "key", "value"}},
+		{"", etcdinteraction.EtcdActionPut{ActionType: etcdinteraction.EtcdActPut, Key: "", Value: ""}},
+		{"key=key", etcdinteraction.EtcdActionPut{ActionType: etcdinteraction.EtcdActPut, Key: "key", Value: ""}},
+		{"key=key&value=value", etcdinteraction.EtcdActionPut{ActionType: etcdinteraction.EtcdActPut, Key: "key", Value: "value"}},
 	}
 
 	for _, putCase := range putCases {
@@ -37,8 +39,8 @@ func TestParseRequest(t *testing.T) {
 
 	r = httptest.NewRequest("GET", "http://localhost:8080/get", nil)
 	getCases := []httpTestInfo{
-		{"", EtcdActionGet{EtcdActGet, "", ""}},
-		{"key=key", EtcdActionGet{EtcdActGet, "key", ""}},
+		{"", etcdinteraction.EtcdActionGet{ActionType: etcdinteraction.EtcdActGet, Key: "", RangeEnd: ""}},
+		{"key=key", etcdinteraction.EtcdActionGet{ActionType: etcdinteraction.EtcdActGet, Key: "key", RangeEnd: ""}},
 	}
 
 	for _, getCase := range getCases {
@@ -52,8 +54,8 @@ func TestParseRequest(t *testing.T) {
 
 	r = httptest.NewRequest("GET", "http://localhost:8080/del", nil)
 	delCases := []httpTestInfo{
-		{"", EtcdActionDelete{EtcdActDelete, "", ""}},
-		{"key=key", EtcdActionDelete{EtcdActDelete, "key", ""}},
+		{"", etcdinteraction.EtcdActionDelete{ActionType: etcdinteraction.EtcdActDelete, Key: "", RangeEnd: ""}},
+		{"key=key", etcdinteraction.EtcdActionDelete{ActionType: etcdinteraction.EtcdActDelete, Key: "key", RangeEnd: ""}},
 	}
 
 	for _, delCase := range delCases {
@@ -76,7 +78,7 @@ func TestWriteResponse(t *testing.T) {
 	w := httptest.NewRecorder()
 
 	writeCases := []writeTestInfo{
-		{nil, EtcdError{"test"}, "test\n"},
+		{nil, etcdinteraction.EtcdError{Msg: "test"}, "test\n"},
 		{[]string{"test1", "test2"}, nil, "test1\ntest2\n"},
 	}
 

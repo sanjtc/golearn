@@ -1,4 +1,4 @@
-package main
+package httpclient
 
 import (
 	"context"
@@ -11,6 +11,8 @@ import (
 	"os/signal"
 	"sync"
 	"syscall"
+
+	"github.com/pantskun/golearn/customEtcdclt/etcdinteraction"
 )
 
 // HTTPClient http client.
@@ -68,47 +70,50 @@ func startHTTPListen(addr string, ctx context.Context) {
 
 func getRequestHandler(w http.ResponseWriter, r *http.Request) {
 	action := parseGetRequest(r)
-	msg, err := action.Exec(GetEtcdClient())
-	writeResponse(msg, err, w)
+	execActionAndWriteResponse(action, w)
 }
 
 func putRequestHandler(w http.ResponseWriter, r *http.Request) {
 	action := parsePutRequest(r)
-	msg, err := action.Exec(GetEtcdClient())
-	writeResponse(msg, err, w)
+	execActionAndWriteResponse(action, w)
 }
 
 func deleteRequestHandler(w http.ResponseWriter, r *http.Request) {
 	action := parseDeleteRequest(r)
-	msg, err := action.Exec(GetEtcdClient())
+	execActionAndWriteResponse(action, w)
+}
+
+func execActionAndWriteResponse(action etcdinteraction.EtcdActionInterface, w http.ResponseWriter) {
+	config := etcdinteraction.ParseEtcdClientConfig("../etcdClientConfig.json")
+	msg, err := action.Exec(etcdinteraction.GetEtcdClient(config))
 	writeResponse(msg, err, w)
 }
 
-func parseGetRequest(r *http.Request) EtcdActionInterface {
+func parseGetRequest(r *http.Request) etcdinteraction.EtcdActionInterface {
 	body, _ := ioutil.ReadAll(r.Body)
 	query, _ := url.ParseQuery(string(body))
 	key := query.Get("key")
 	rangeEnd := query.Get("rangeEnd")
 
-	return &EtcdActionGet{EtcdActGet, key, rangeEnd}
+	return &etcdinteraction.EtcdActionGet{ActionType: etcdinteraction.EtcdActGet, Key: key, RangeEnd: rangeEnd}
 }
 
-func parsePutRequest(r *http.Request) EtcdActionInterface {
+func parsePutRequest(r *http.Request) etcdinteraction.EtcdActionInterface {
 	body, _ := ioutil.ReadAll(r.Body)
 	query, _ := url.ParseQuery(string(body))
 	key := query.Get("key")
 	value := query.Get("value")
 
-	return &EtcdActionPut{EtcdActPut, key, value}
+	return &etcdinteraction.EtcdActionPut{ActionType: etcdinteraction.EtcdActPut, Key: key, Value: value}
 }
 
-func parseDeleteRequest(r *http.Request) EtcdActionInterface {
+func parseDeleteRequest(r *http.Request) etcdinteraction.EtcdActionInterface {
 	body, _ := ioutil.ReadAll(r.Body)
 	query, _ := url.ParseQuery(string(body))
 	key := query.Get("key")
 	rangeEnd := query.Get("rangeEnd")
 
-	return &EtcdActionDelete{EtcdActDelete, key, rangeEnd}
+	return &etcdinteraction.EtcdActionDelete{ActionType: etcdinteraction.EtcdActDelete, Key: key, RangeEnd: rangeEnd}
 }
 
 func writeResponse(msgs []string, err error, w http.ResponseWriter) {

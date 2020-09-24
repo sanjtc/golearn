@@ -1,8 +1,7 @@
-package main
+package etcdinteraction
 
 import (
 	"context"
-	"log"
 	"strconv"
 	"time"
 
@@ -45,13 +44,40 @@ type EtcdActionDelete struct {
 	RangeEnd   string
 }
 
+// NewGetAction new get action.
+func NewGetAction(key string, rangeEnd string) EtcdActionInterface {
+	return &EtcdActionGet{
+		ActionType: EtcdActGet,
+		Key:        key,
+		RangeEnd:   rangeEnd,
+	}
+}
+
+// NewPutAction new put action.
+func NewPutAction(key string, value string) EtcdActionInterface {
+	return &EtcdActionPut{
+		ActionType: EtcdActPut,
+		Key:        key,
+		Value:      value,
+	}
+}
+
+// NewDeleteAction new delete action.
+func NewDeleteAction(key string, rangeEnd string) EtcdActionInterface {
+	return &EtcdActionDelete{
+		ActionType: EtcdActDelete,
+		Key:        key,
+		RangeEnd:   rangeEnd,
+	}
+}
+
 // EtcdError etcd error.
 type EtcdError struct {
-	msg string
+	Msg string
 }
 
 func (e EtcdError) Error() string {
-	return e.msg
+	return e.Msg
 }
 
 // Equal get action.
@@ -86,12 +112,12 @@ func (action EtcdActionPut) Equal(b EtcdActionInterface) bool {
 
 // Exec execute etcd get action.
 func (action EtcdActionGet) Exec(client *clientv3.Client) ([]string, error) {
-	if action.Key == "" {
-		return nil, EtcdError{"get command needs one argument as key and an optional argument as range_end"}
-	}
-
 	if client == nil {
 		return nil, EtcdError{"can not connect to etcd"}
+	}
+
+	if action.Key == "" {
+		return nil, EtcdError{"get command needs one argument as key and an optional argument as range_end"}
 	}
 
 	ctx, cancel := context.WithTimeout(context.Background(), timeoutSecond*time.Second)
@@ -119,12 +145,12 @@ func (action EtcdActionGet) Exec(client *clientv3.Client) ([]string, error) {
 
 // Exec execute etcd put action.
 func (action EtcdActionPut) Exec(client *clientv3.Client) ([]string, error) {
-	if action.Key == "" || action.Value == "" {
-		return nil, EtcdError{"put command needs 2 arguments"}
-	}
-
 	if client == nil {
 		return nil, EtcdError{"can not connect to etcd"}
+	}
+
+	if action.Key == "" || action.Value == "" {
+		return nil, EtcdError{"put command needs 2 arguments"}
 	}
 
 	ctx, cancel := context.WithTimeout(context.Background(), timeoutSecond*time.Second)
@@ -139,12 +165,12 @@ func (action EtcdActionPut) Exec(client *clientv3.Client) ([]string, error) {
 
 // Exec execute etcd delete action.
 func (action EtcdActionDelete) Exec(client *clientv3.Client) ([]string, error) {
-	if action.Key == "" {
-		return nil, EtcdError{"del command needs one argument as key and an optional argument as range_end"}
-	}
-
 	if client == nil {
 		return nil, EtcdError{"can not connect to etcd"}
+	}
+
+	if action.Key == "" {
+		return nil, EtcdError{"del command needs one argument as key and an optional argument as range_end"}
 	}
 
 	ctx, cancel := context.WithTimeout(context.Background(), timeoutSecond*time.Second)
@@ -163,17 +189,7 @@ func (action EtcdActionDelete) Exec(client *clientv3.Client) ([]string, error) {
 }
 
 // GetEtcdClient return etcd client.
-func GetEtcdClient() *clientv3.Client {
-	config := ParseEtcdClientConfig("etcdClientConfig.json")
-
-	var (
-		client *clientv3.Client
-		err    error
-	)
-
-	if client, err = clientv3.New(config); err != nil {
-		log.Println(err)
-	}
-
+func GetEtcdClient(config clientv3.Config) *clientv3.Client {
+	client, _ := clientv3.New(config)
 	return client
 }

@@ -1,4 +1,4 @@
-package main
+package etcdinteraction
 
 import (
 	"encoding/json"
@@ -24,11 +24,7 @@ func ParseEtcdClientConfig(filePath string) clientv3.Config {
 		return defaultConfig
 	}
 
-	fb, err := ioutil.ReadAll(f)
-	if err != nil {
-		log.Println(err)
-		return defaultConfig
-	}
+	fb, _ := ioutil.ReadAll(f)
 
 	type EtcdConfigs struct {
 		Endpoint    string
@@ -38,6 +34,10 @@ func ParseEtcdClientConfig(filePath string) clientv3.Config {
 	var fileConfigs EtcdConfigs
 	if err := json.Unmarshal(fb, &fileConfigs); err != nil {
 		log.Println(err)
+		return defaultConfig
+	}
+
+	if fileConfigs.Endpoint == "" || fileConfigs.DialTimeout == 0 {
 		return defaultConfig
 	}
 
