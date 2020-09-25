@@ -143,6 +143,28 @@ func TestGetEtcdClient(t *testing.T) {
 }
 
 func TestEtcdActionEqual(t *testing.T) {
+	tdir, err := ioutil.TempDir(os.TempDir(), "embed-test")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	defer os.RemoveAll(tdir)
+
+	// create an embedded EtcdServer from the default configuration
+	cfg := embed.NewConfig()
+	cfg.Dir = tdir
+
+	e, err := embed.StartEtcd(cfg)
+	if err != nil {
+		// handle error!
+		t.Log(err)
+	}
+	defer e.Close()
+
+	// wrap the EtcdServer with v3client
+	client := v3client.New(e.Server)
+	defer client.Close()
+
 	type testInfo struct {
 		action1 EtcdActionInterface
 		action2 EtcdActionInterface
@@ -179,5 +201,55 @@ func TestEtcdActionEqual(t *testing.T) {
 		if unequalCase.action1.Equal(unequalCase.action2) {
 			t.Error(unequalCase.action1, " equal ", unequalCase.action2)
 		}
+	}
+}
+
+func TestExecuteAction(t *testing.T) {
+	tdir, err := ioutil.TempDir(os.TempDir(), "embed-test")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	defer os.RemoveAll(tdir)
+
+	// create an embedded EtcdServer from the default configuration
+	cfg := embed.NewConfig()
+	cfg.Dir = tdir
+
+	e, err := embed.StartEtcd(cfg)
+	if err != nil {
+		// handle error!
+		t.Log(err)
+	}
+	defer e.Close()
+
+	// wrap the EtcdServer with v3client
+	client := v3client.New(e.Server)
+	defer client.Close()
+
+	type testInfo struct {
+		action   EtcdActionInterface
+		expected string
+	}
+
+	testCases := []testInfo{
+		{nil, new(EtcdActionNilError).Error()},
+		{NewPutAction("key", "value"), "OK\n"},
+		{NewGetAction("key", ""), "key\nvalue\n"},
+		{NewDeleteAction("key", ""), "1\n"},
+	}
+
+	for _, testCase := range testCases {
+		result := ExecuteAction(testCase.action, client)
+		if result != testCase.expected {
+			t.Error("expected: ", testCase.expected, " got: ", result)
+		}
+	}
+}
+
+func TestError(t *testing.T) {
+	err := EtcdActionNilError{}
+	if err.Error() != "action is nil" {
+		t.Error("EtcdActionNilError got unexpected string")
 	}
 }

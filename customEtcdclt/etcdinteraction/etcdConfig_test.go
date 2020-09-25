@@ -36,19 +36,19 @@ func TestParseEtcdClientConfig(t *testing.T) {
 		return true
 	}
 
-	if config := ParseEtcdClientConfig(""); !EqualConfig(config, defaultConfig) {
+	if config := GetEtcdClientConfig(""); !EqualConfig(config, defaultConfig) {
 		t.Error("exepected: ", defaultConfig, "got: ", config)
 	}
 
-	if config := ParseEtcdClientConfig("../etcdClientConfig.json"); EqualConfig(config, defaultConfig) {
+	if config := GetEtcdClientConfig("../etcdClientConfig.json"); EqualConfig(config, defaultConfig) {
 		t.Error("got default config")
 	}
 
-	if config := ParseEtcdClientConfig("../errorEtcdClientConfig.json"); !EqualConfig(config, defaultConfig) {
+	if config := GetEtcdClientConfig("../errorEtcdClientConfig.json"); !EqualConfig(config, defaultConfig) {
 		t.Error("exepected: ", defaultConfig, "got: ", config)
 	}
 
-	if config := ParseEtcdClientConfig("../errorEtcdClientConfig2.json"); !EqualConfig(config, defaultConfig) {
+	if config := GetEtcdClientConfig("../errorEtcdClientConfig2.json"); !EqualConfig(config, defaultConfig) {
 		t.Error("exepected: ", defaultConfig, "got: ", config)
 	}
 }

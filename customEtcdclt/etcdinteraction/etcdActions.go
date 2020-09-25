@@ -80,6 +80,12 @@ func (e EtcdError) Error() string {
 	return e.Msg
 }
 
+type EtcdActionNilError struct{}
+
+func (e EtcdActionNilError) Error() string {
+	return "action is nil"
+}
+
 // Equal get action.
 func (action *EtcdActionGet) Equal(b EtcdActionInterface) bool {
 	v, ok := b.(*EtcdActionGet)
@@ -196,7 +202,8 @@ func GetEtcdClient(config clientv3.Config) *clientv3.Client {
 
 func ExecuteAction(action EtcdActionInterface, client *clientv3.Client) string {
 	if action == nil {
-		return "action is nil"
+		err := EtcdActionNilError{}
+		return err.Error()
 	}
 
 	if msgs, err := action.Exec(client); err != nil {

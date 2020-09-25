@@ -4,16 +4,13 @@ import (
 	"bytes"
 	"io/ioutil"
 	"net/http/httptest"
+	"sync"
+	"syscall"
 	"testing"
+	"time"
 
 	"github.com/pantskun/golearn/customEtcdclt/etcdinteraction"
 )
-
-// const (
-// 	putErrMsg = "put command needs 2 arguments\n"
-// 	getErrMsg = "get command needs one argument as key and an optional argument as range_end\n"
-// 	delErrMsg = "del command needs one argument as key and an optional argument as range_end\n"
-// )
 
 func TestParseRequest(t *testing.T) {
 	type httpTestInfo struct {
@@ -93,3 +90,35 @@ func TestWriteResponse(t *testing.T) {
 		}
 	}
 }
+
+func TestHTTPClient(t *testing.T) {
+	wg := sync.WaitGroup{}
+
+	var err error
+
+	wg.Add(1)
+
+	go func() {
+		defer wg.Done()
+
+		err = HTTPClient(":8080")
+	}()
+
+	time.Sleep(2 * time.Second)
+
+	_ = syscall.Kill(syscall.Getpid(), syscall.SIGINT)
+
+	wg.Wait()
+
+	if err.Error() != "http: Server closed" {
+		t.Error("not got server close")
+	}
+}
+
+// func TestListenSystemSignal(t *testing.T) {
+// 	ctx, cancel := context.WithCancel(context.Background())
+
+// 	go func(){
+
+// 	}
+// }

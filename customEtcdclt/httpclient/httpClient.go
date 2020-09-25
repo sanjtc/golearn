@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"net/url"
 	"os"
@@ -15,8 +14,10 @@ import (
 	"github.com/pantskun/golearn/customEtcdclt/etcdinteraction"
 )
 
+type SigintErr struct{}
+
 // HTTPClient http client.
-func HTTPClient(addr string) {
+func HTTPClient(addr string) error {
 	wg := sync.WaitGroup{}
 	defer wg.Wait()
 
@@ -26,32 +27,29 @@ func HTTPClient(addr string) {
 
 	go func() {
 		defer wg.Done()
-		startHTTPListen(addr, ctx)
+
+		listenSystemSignal(ctx, cancel)
 	}()
 
-	wg.Add(1)
-
-	go func() {
-		defer wg.Done()
-
-		ss := make(chan os.Signal, 1)
-		signal.Notify(ss, syscall.SIGINT, syscall.SIGTERM)
-
-		select {
-		case <-ctx.Done():
-			return
-		case s := <-ss:
-			fmt.Println("got signal:", s)
-			cancel()
-
-			return
-		}
-	}()
+	return startHTTPListen(addr, ctx)
 }
 
-func startHTTPListen(addr string, ctx context.Context) {
+func listenSystemSignal(ctx context.Context, cancel context.CancelFunc) {
+	ss := make(chan os.Signal, 1)
+	signal.Notify(ss, syscall.SIGINT)
+
+	select {
+	case <-ctx.Done():
+		return
+	case s := <-ss:
+		fmt.Println("got signal:", s)
+		cancel()
+	}
+}
+
+func startHTTPListen(addr string, ctx context.Context) error {
 	server := &http.Server{Addr: addr, Handler: nil}
-	// close the server when ctx done
+	// close server when ctx done
 	go func() {
 		<-ctx.Done()
 		server.Close()
@@ -63,9 +61,7 @@ func startHTTPListen(addr string, ctx context.Context) {
 
 	fmt.Println("start listen to ", addr)
 
-	if err := server.ListenAndServe(); err != nil {
-		log.Println(err)
-	}
+	return server.ListenAndServe()
 }
 
 func getRequestHandler(w http.ResponseWriter, r *http.Request) {
@@ -84,7 +80,7 @@ func deleteRequestHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func execActionAndWriteResponse(action etcdinteraction.EtcdActionInterface, w http.ResponseWriter) {
-	config := etcdinteraction.ParseEtcdClientConfig("../etcdClientConfig.json")
+	config := etcdinteraction.GetEtcdClientConfig("../etcdClientConfig.json")
 	msg, err := action.Exec(etcdinteraction.GetEtcdClient(config))
 	writeResponse(msg, err, w)
 }
@@ -95,7 +91,7 @@ func parseGetRequest(r *http.Request) etcdinteraction.EtcdActionInterface {
 	key := query.Get("key")
 	rangeEnd := query.Get("rangeEnd")
 
-	return &etcdinteraction.EtcdActionGet{ActionType: etcdinteraction.EtcdActGet, Key: key, RangeEnd: rangeEnd}
+	return etcdinteraction.NewGetAction(key, rangeEnd)
 }
 
 func parsePutRequest(r *http.Request) etcdinteraction.EtcdActionInterface {
@@ -104,7 +100,7 @@ func parsePutRequest(r *http.Request) etcdinteraction.EtcdActionInterface {
 	key := query.Get("key")
 	value := query.Get("value")
 
-	return &etcdinteraction.EtcdActionPut{ActionType: etcdinteraction.EtcdActPut, Key: key, Value: value}
+	return etcdinteraction.NewPutAction(key, value)
 }
 
 func parseDeleteRequest(r *http.Request) etcdinteraction.EtcdActionInterface {
@@ -113,7 +109,7 @@ func parseDeleteRequest(r *http.Request) etcdinteraction.EtcdActionInterface {
 	key := query.Get("key")
 	rangeEnd := query.Get("rangeEnd")
 
-	return &etcdinteraction.EtcdActionDelete{ActionType: etcdinteraction.EtcdActDelete, Key: key, RangeEnd: rangeEnd}
+	return etcdinteraction.NewDeleteAction(key, rangeEnd)
 }
 
 func writeResponse(msgs []string, err error, w http.ResponseWriter) {
