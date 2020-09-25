@@ -14,8 +14,6 @@ import (
 	"github.com/pantskun/golearn/customEtcdclt/etcdinteraction"
 )
 
-type SigintErr struct{}
-
 // HTTPClient http client.
 func HTTPClient(addr string) error {
 	wg := sync.WaitGroup{}
