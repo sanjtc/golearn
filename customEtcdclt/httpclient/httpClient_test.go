@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"io/ioutil"
 	"net/http/httptest"
-	"os"
 	"sync"
 	"syscall"
 	"testing"
@@ -107,13 +106,7 @@ func TestHTTPClient(t *testing.T) {
 
 	time.Sleep(2 * time.Second)
 
-	if pro, err := os.FindProcess(syscall.Getpid()); err != nil {
-		t.Error("unknow pid")
-	} else {
-		_ = pro.Kill()
-	}
-
-	// _ = syscall.Kill(syscall.Getpid(), syscall.SIGINT) //linux
+	_ = syscall.Kill(syscall.Getpid(), syscall.SIGINT) // linux
 
 	wg.Wait()
 
@@ -121,11 +114,3 @@ func TestHTTPClient(t *testing.T) {
 		t.Error("not got server close")
 	}
 }
-
-// func TestListenSystemSignal(t *testing.T) {
-// 	ctx, cancel := context.WithCancel(context.Background())
-
-// 	go func(){
-
-// 	}
-// }
