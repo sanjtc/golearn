@@ -9,7 +9,6 @@ import (
 	"os"
 	"os/signal"
 	"sync"
-	"syscall"
 
 	"github.com/pantskun/golearn/customEtcdclt/etcdinteraction"
 )
@@ -34,14 +33,20 @@ func HTTPClient(addr string) error {
 
 func listenSystemSignal(ctx context.Context, cancel context.CancelFunc) {
 	ss := make(chan os.Signal, 1)
-	signal.Notify(ss, syscall.SIGINT)
+	signal.Notify(ss)
 
-	select {
-	case <-ctx.Done():
-		return
-	case s := <-ss:
-		fmt.Println("got signal:", s)
-		cancel()
+	for {
+		select {
+		case <-ctx.Done():
+			return
+		case s := <-ss:
+			if s == os.Interrupt {
+				fmt.Println("got signal:", s)
+				cancel()
+
+				return
+			}
+		}
 	}
 }
 
