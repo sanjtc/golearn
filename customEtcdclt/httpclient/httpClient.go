@@ -13,6 +13,8 @@ import (
 	"github.com/pantskun/golearn/customEtcdclt/etcdinteraction"
 )
 
+var ctrlBreakChan chan os.Signal
+
 // HTTPClient http client.
 func HTTPClient(addr string) error {
 	wg := sync.WaitGroup{}
@@ -32,14 +34,14 @@ func HTTPClient(addr string) error {
 }
 
 func listenSystemSignal(ctx context.Context, cancel context.CancelFunc) {
-	ss := make(chan os.Signal, 1)
-	signal.Notify(ss)
+	ctrlBreakChan = make(chan os.Signal, 1)
+	signal.Notify(ctrlBreakChan)
 
 	for {
 		select {
 		case <-ctx.Done():
 			return
-		case s := <-ss:
+		case s := <-ctrlBreakChan:
 			if s == os.Interrupt {
 				fmt.Println("got signal:", s)
 				cancel()

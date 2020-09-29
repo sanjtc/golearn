@@ -4,8 +4,8 @@ import (
 	"bytes"
 	"io/ioutil"
 	"net/http/httptest"
+	"os"
 	"sync"
-	"syscall"
 	"testing"
 	"time"
 
@@ -125,10 +125,14 @@ func TestHTTPClient(t *testing.T) {
 	// 	sendCtrlBreak(t, syscall.Getpid())
 	// } // windows
 
-	{
-		time.Sleep(1 * time.Second)
-		_ = syscall.Kill(syscall.Getpid(), syscall.SIGINT)
-	} // linux
+	// {
+	// 	time.Sleep(1 * time.Second)
+	// 	_ = syscall.Kill(syscall.Getpid(), syscall.SIGINT)
+	// } // linux
+
+	time.Sleep(1 * time.Second)
+
+	ctrlBreakChan <- os.Interrupt
 
 	wg.Wait()
 
