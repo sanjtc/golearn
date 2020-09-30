@@ -1,7 +1,7 @@
 package main
 
 import (
-	"golearn/microServer/helloworld/handler"
+	"github.com/pantskun/golearn/microServer/helloworld/handler"
 
 	"github.com/micro/go-micro/v3/logger"
 	"github.com/micro/micro/v3/service"

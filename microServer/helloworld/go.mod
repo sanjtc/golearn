@@ -6,7 +6,6 @@ require (
 	github.com/golang/protobuf v1.4.2
 	github.com/micro/go-micro/v3 v3.0.0-beta.2
 	github.com/micro/micro/v3 v3.0.0-beta.3
-	github.com/micro/services v0.10.0 // indirect
 	golang.org/x/net v0.0.0-20200904194848-62affa334b73 // indirect
 	golang.org/x/sys v0.0.0-20200909081042-eff7692f9009 // indirect
 	golang.org/x/text v0.3.3 // indirect
