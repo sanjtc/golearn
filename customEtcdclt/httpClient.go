@@ -70,7 +70,6 @@ func startHTTPListen(addr string, ctx context.Context) {
 
 // GetActionHandler handle get action.
 func GetActionHandler(w http.ResponseWriter, r *http.Request) {
-	// query := r.URL.Query()
 	body, _ := ioutil.ReadAll(r.Body)
 	query, _ := url.ParseQuery(string(body))
 	key := query.Get("key")
@@ -82,7 +81,6 @@ func GetActionHandler(w http.ResponseWriter, r *http.Request) {
 
 // PutActionHandler handle put action.
 func PutActionHandler(w http.ResponseWriter, r *http.Request) {
-	// query := r.URL.Query()
 	body, _ := ioutil.ReadAll(r.Body)
 	query, _ := url.ParseQuery(string(body))
 	key := query.Get("key")
@@ -93,7 +91,6 @@ func PutActionHandler(w http.ResponseWriter, r *http.Request) {
 
 // DeleteActionHandler handle delete action.
 func DeleteActionHandler(w http.ResponseWriter, r *http.Request) {
-	// query := r.URL.Query()
 	body, _ := ioutil.ReadAll(r.Body)
 	query, _ := url.ParseQuery(string(body))
 	key := query.Get("key")

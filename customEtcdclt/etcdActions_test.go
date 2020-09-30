@@ -69,3 +69,7 @@ func TestActionExec(t *testing.T) {
 		}
 	}
 }
+
+func TestNewCtxClient(t *testing.T) {
+
+}
