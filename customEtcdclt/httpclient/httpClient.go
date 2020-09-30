@@ -14,7 +14,7 @@ import (
 )
 
 // HTTPClient http client.
-func HTTPClient(addr string) error {
+func HTTPClient(addr string, ctrlBreakChan chan os.Signal) error {
 	wg := sync.WaitGroup{}
 	defer wg.Wait()
 
@@ -25,21 +25,20 @@ func HTTPClient(addr string) error {
 	go func() {
 		defer wg.Done()
 
-		listenSystemSignal(ctx, cancel)
+		listenSystemSignal(ctrlBreakChan, ctx, cancel)
 	}()
 
 	return startHTTPListen(addr, ctx)
 }
 
-func listenSystemSignal(ctx context.Context, cancel context.CancelFunc) {
-	ss := make(chan os.Signal, 1)
-	signal.Notify(ss)
+func listenSystemSignal(ctrlBreakChan chan os.Signal, ctx context.Context, cancel context.CancelFunc) {
+	signal.Notify(ctrlBreakChan)
 
 	for {
 		select {
 		case <-ctx.Done():
 			return
-		case s := <-ss:
+		case s := <-ctrlBreakChan:
 			if s == os.Interrupt {
 				fmt.Println("got signal:", s)
 				cancel()

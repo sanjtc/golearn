@@ -55,3 +55,7 @@ func TestUnsafe(t *testing.T) {
 	t.Log(unsafe.Sizeof(test))
 	t.Log(unsafe.Alignof(testint))
 }
+
+func GetTestStruct() *testStruct {
+	return &testStruct{intval: 1, stringval: "1"}
+}
