@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+package etcdcltmicro;
+
+// option go_package = "github.com/pantskun/golearn/customEtcdclt/etcdmicro/proto/etcdmicro";
+
+service EtcdcltMicro{
+    rpc Call(Request) returns(Response) {}
+}
+
+message Request{
+    string action = 1;
+    string key = 2;
+    string value =3;
+}
+
+message Response{
+    string msg = 1;
+}
