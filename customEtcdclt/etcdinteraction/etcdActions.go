@@ -45,7 +45,19 @@ type EtcdActionDelete struct {
 }
 
 // NewGetAction new get action.
-func NewGetAction(key string, rangeEnd string) EtcdActionInterface {
+// args: key, rangeEnd
+func NewGetAction(args ...string) EtcdActionInterface {
+	key := ""
+	rangeEnd := ""
+
+	switch len(args) {
+	case 1:
+		key = args[0]
+	case 2:
+		key = args[0]
+		rangeEnd = args[1]
+	}
+
 	return &EtcdActionGet{
 		ActionType: EtcdActGet,
 		Key:        key,
@@ -54,7 +66,19 @@ func NewGetAction(key string, rangeEnd string) EtcdActionInterface {
 }
 
 // NewPutAction new put action.
-func NewPutAction(key string, value string) EtcdActionInterface {
+// args: key, value
+func NewPutAction(args ...string) EtcdActionInterface {
+	key := ""
+	value := ""
+
+	switch len(args) {
+	case 1:
+		key = args[0]
+	case 2:
+		key = args[0]
+		value = args[1]
+	}
+
 	return &EtcdActionPut{
 		ActionType: EtcdActPut,
 		Key:        key,
@@ -63,7 +87,19 @@ func NewPutAction(key string, value string) EtcdActionInterface {
 }
 
 // NewDeleteAction new delete action.
-func NewDeleteAction(key string, rangeEnd string) EtcdActionInterface {
+// args: key, rangeEnd
+func NewDeleteAction(args ...string) EtcdActionInterface {
+	key := ""
+	rangeEnd := ""
+
+	switch len(args) {
+	case 1:
+		key = args[0]
+	case 2:
+		key = args[0]
+		rangeEnd = args[1]
+	}
+
 	return &EtcdActionDelete{
 		ActionType: EtcdActDelete,
 		Key:        key,
