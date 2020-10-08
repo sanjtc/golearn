@@ -8,11 +8,11 @@ import (
 
 func main() {
 	srv := service.New(
-		service.Name("etcdservice"),
+		service.Name("etcdcltmicro"),
 		service.Version("latest"),
 	)
 
-	srv.Handle(new(handler.EtcdcltMicro))
+	_ = srv.Handle(new(handler.EtcdcltMicro))
 
 	if err := srv.Run(); err != nil {
 		logger.Fatal(err)
