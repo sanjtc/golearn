@@ -15,6 +15,11 @@ const (
 	EtcdActDelete = 3
 )
 
+const (
+	ONE = 1
+	TWO = 2
+)
+
 const timeoutSecond = 5.0
 
 // EtcdActionInterface etcd action interface.
@@ -51,9 +56,9 @@ func NewGetAction(args ...string) EtcdActionInterface {
 	rangeEnd := ""
 
 	switch len(args) {
-	case 1:
+	case ONE:
 		key = args[0]
-	case 2:
+	case TWO:
 		key = args[0]
 		rangeEnd = args[1]
 	}
@@ -72,9 +77,9 @@ func NewPutAction(args ...string) EtcdActionInterface {
 	value := ""
 
 	switch len(args) {
-	case 1:
+	case ONE:
 		key = args[0]
-	case 2:
+	case TWO:
 		key = args[0]
 		value = args[1]
 	}
@@ -93,9 +98,9 @@ func NewDeleteAction(args ...string) EtcdActionInterface {
 	rangeEnd := ""
 
 	switch len(args) {
-	case 1:
+	case ONE:
 		key = args[0]
-	case 2:
+	case TWO:
 		key = args[0]
 		rangeEnd = args[1]
 	}
@@ -173,8 +178,6 @@ func (action EtcdActionGet) Exec(client *clientv3.Client) ([]string, error) {
 	if getResp, err = client.Get(ctx, action.Key); err != nil {
 		return nil, err
 	}
-
-	const TWO = 2
 
 	result := make([]string, getResp.Count*TWO)
 	for i, elem := range getResp.Kvs {
