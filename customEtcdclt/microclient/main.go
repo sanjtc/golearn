@@ -9,14 +9,9 @@ import (
 )
 
 func main() {
-	// req := client.NewRequest("etcdcltmicro", "EtcdcltMicro.Call", &pb.Request{Action: "get", Key: "key"})
-	// rsp := new(pb.Response)
+	ms := pb.NewEtcdcltMicroService("etcdcltmicro", client.DefaultClient)
 
-	// err := client.Call(context.Background(), req, &rsp)
-
-	hw := pb.NewEtcdcltMicroService("etcdcltmicro", client.DefaultClient)
-	rsp, err := hw.Call(context.Background(), &pb.Request{Action: "put", Key: "key", Value: "value"})
-
+	rsp, err := ms.Call(context.Background(), &pb.Request{Action: "put", Key: "key", Value: "value"})
 	if err != nil {
 		fmt.Println(err)
 		return
