@@ -15,7 +15,7 @@ func CMDClient() {
 	flag.Parse()
 	argv := flag.Args()
 	action := parseCmdAction(argv)
-	config := etcdinteraction.GetEtcdClientConfig("../etcdClientConfig.json")
+	config := etcdinteraction.GetEtcdClientConfig("../../etcdClientConfig.json")
 	fmt.Println(etcdinteraction.ExecuteAction(action, etcdinteraction.GetEtcdClient(config)))
 }
 

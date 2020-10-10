@@ -82,7 +82,7 @@ func deleteRequestHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func execActionAndWriteResponse(action etcdinteraction.EtcdActionInterface, w http.ResponseWriter) {
-	config := etcdinteraction.GetEtcdClientConfig("../etcdClientConfig.json")
+	config := etcdinteraction.GetEtcdClientConfig("../../etcdClientConfig.json")
 	msg, err := action.Exec(etcdinteraction.GetEtcdClient(config))
 	writeResponse(msg, err, w)
 }
