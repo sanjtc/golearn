@@ -5,6 +5,8 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"path"
+	"strings"
 
 	"github.com/PuerkitoBio/goquery"
 	"golang.org/x/net/html"
@@ -23,6 +25,25 @@ func GetElementAttributeValue(element *html.Node, attribute string) string {
 	}
 
 	return ""
+}
+
+type URLFilter func(string) bool
+
+func FilterURL(urls []string, filters ...URLFilter) []string {
+	result := []string{}
+	for _, url := range urls {
+		need := true
+		for _, filter := range filters {
+			if !filter(url) {
+				need = false
+				break
+			}
+		}
+		if need {
+			result = append(result, url)
+		}
+	}
+	return result
 }
 
 func main() {
@@ -46,7 +67,31 @@ func main() {
 	}
 
 	nodes := doc.Find("a").Nodes
+	urls := []string{}
 	for _, n := range nodes {
-		log.Println("Name: ", n.Data, " herf: ", GetElementAttributeValue(n, "href"))
+		url := GetElementAttributeValue(n, "href")
+		log.Println("Name: ", n.Data, " herf: ", url)
+		urls = append(urls, url)
+	}
+
+	urlPrefixFilter := func(url string) bool {
+		if strings.HasPrefix(url, "http://") || strings.HasPrefix(url, "https://") {
+			return true
+		}
+		return false
+	}
+
+	urlHTMLFilter := func(url string) bool {
+		ext := path.Ext(url)
+		if ext == ".html" {
+			return true
+		}
+		return false
+	}
+
+	urls = FilterURL(urls, urlPrefixFilter, urlHTMLFilter)
+
+	for _, url := range urls {
+		log.Println(url)
 	}
 }
