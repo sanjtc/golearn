@@ -1,7 +1,7 @@
 package main
 
-import "github.com/pantskun/golearn/customEtcdclt/cmdclient/cmdclient"
+import "github.com/pantskun/golearn/customEtcdclt/cmdclient/client"
 
 func main() {
-	cmdclient.CMDClient()
+	client.CMDClient()
 }

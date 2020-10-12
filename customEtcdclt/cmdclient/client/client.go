@@ -1,4 +1,4 @@
-package cmdclient
+package client
 
 import (
 	"flag"

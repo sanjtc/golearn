@@ -4,9 +4,9 @@ import (
 	"log"
 	"os"
 
-	"github.com/pantskun/golearn/customEtcdclt/httpclient/httpclient"
+	"github.com/pantskun/golearn/customEtcdclt/httpclient/client"
 )
 
 func main() {
-	log.Println(httpclient.HTTPClient(":8080", make(chan os.Signal, 1)))
+	log.Println(client.HTTPClient(":8080", make(chan os.Signal, 1)))
 }
