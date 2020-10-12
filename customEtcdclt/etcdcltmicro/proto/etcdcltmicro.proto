@@ -16,4 +16,5 @@ message Request{
 
 message Response{
     string msg = 1;
+    string err = 2;
 }

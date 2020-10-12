@@ -65,32 +65,6 @@ func TestParseRequest(t *testing.T) {
 	}
 }
 
-func TestWriteResponse(t *testing.T) {
-	type writeTestInfo struct {
-		msgs     []string
-		err      error
-		expected string
-	}
-
-	w := httptest.NewRecorder()
-
-	writeCases := []writeTestInfo{
-		{nil, etcdinteraction.EtcdError{Msg: "test"}, "test\n"},
-		{[]string{"test1", "test2"}, nil, "test1\ntest2\n"},
-	}
-
-	for _, writeCase := range writeCases {
-		writeResponse(writeCase.msgs, writeCase.err, w)
-
-		body, _ := ioutil.ReadAll(w.Body)
-		bodystr := string(body)
-
-		if bodystr != writeCase.expected {
-			t.Errorf("expect: %s, get: %s", writeCase.expected, bodystr)
-		}
-	}
-}
-
 func TestHTTPClient(t *testing.T) {
 	wg := sync.WaitGroup{}
 

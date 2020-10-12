@@ -1,7 +1,15 @@
 package main
 
-import "github.com/pantskun/golearn/customEtcdclt/cmdclient/client"
+import (
+	"fmt"
+
+	"github.com/pantskun/golearn/customEtcdclt/cmdclient/client"
+)
 
 func main() {
-	client.CMDClient()
+	if msg, err := client.CMDClient(); err != nil {
+		fmt.Println(err)
+	} else {
+		fmt.Println(msg)
+	}
 }

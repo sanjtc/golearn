@@ -239,19 +239,19 @@ func GetEtcdClient(config clientv3.Config) *clientv3.Client {
 	return client
 }
 
-func ExecuteAction(action EtcdActionInterface, client *clientv3.Client) string {
+func ExecuteAction(action EtcdActionInterface, client *clientv3.Client) (string, error) {
 	if action == nil {
 		err := EtcdActionNilError{}
-		return err.Error()
+		return "", err
 	}
 
 	if msgs, err := action.Exec(client); err != nil {
-		return err.Error()
+		return "", err
 	} else {
 		result := ""
 		for _, msg := range msgs {
 			result = result + msg + "\n"
 		}
-		return result
+		return result, nil
 	}
 }

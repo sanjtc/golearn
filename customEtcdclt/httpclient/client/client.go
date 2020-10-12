@@ -67,24 +67,26 @@ func startHTTPListen(addr string, ctx context.Context) error {
 }
 
 func getRequestHandler(w http.ResponseWriter, r *http.Request) {
-	action := parseGetRequest(r)
-	execActionAndWriteResponse(action, w)
+	execActionAndWriteResponse(parseGetRequest(r), w)
 }
 
 func putRequestHandler(w http.ResponseWriter, r *http.Request) {
-	action := parsePutRequest(r)
-	execActionAndWriteResponse(action, w)
+	execActionAndWriteResponse(parsePutRequest(r), w)
 }
 
 func deleteRequestHandler(w http.ResponseWriter, r *http.Request) {
-	action := parseDeleteRequest(r)
-	execActionAndWriteResponse(action, w)
+	execActionAndWriteResponse(parseDeleteRequest(r), w)
 }
 
 func execActionAndWriteResponse(action etcdinteraction.EtcdActionInterface, w http.ResponseWriter) {
 	config := etcdinteraction.GetEtcdClientConfig("../../etcdClientConfig.json")
-	msg, err := action.Exec(etcdinteraction.GetEtcdClient(config))
-	writeResponse(msg, err, w)
+
+	msg, err := etcdinteraction.ExecuteAction(action, etcdinteraction.GetEtcdClient(config))
+	if err != nil {
+		msg = err.Error()
+	}
+
+	_, _ = w.Write([]byte(msg))
 }
 
 func parseGetRequest(r *http.Request) etcdinteraction.EtcdActionInterface {
@@ -112,15 +114,4 @@ func parseDeleteRequest(r *http.Request) etcdinteraction.EtcdActionInterface {
 	rangeEnd := query.Get("rangeEnd")
 
 	return etcdinteraction.NewDeleteAction(key, rangeEnd)
-}
-
-func writeResponse(msgs []string, err error, w http.ResponseWriter) {
-	if err != nil {
-		_, _ = w.Write([]byte(err.Error() + "\n"))
-		return
-	}
-
-	for _, msg := range msgs {
-		_, _ = w.Write([]byte(msg + "\n"))
-	}
 }

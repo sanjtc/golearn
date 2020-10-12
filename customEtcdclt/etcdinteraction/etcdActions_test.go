@@ -240,7 +240,11 @@ func TestExecuteAction(t *testing.T) {
 	}
 
 	for _, testCase := range testCases {
-		result := ExecuteAction(testCase.action, client)
+		result, err := ExecuteAction(testCase.action, client)
+		if err != nil {
+			result = err.Error()
+		}
+
 		if result != testCase.expected {
 			t.Error("expected: ", testCase.expected, " got: ", result)
 		}

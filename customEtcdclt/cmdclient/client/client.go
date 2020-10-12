@@ -2,7 +2,6 @@ package client
 
 import (
 	"flag"
-	"fmt"
 
 	"github.com/pantskun/golearn/customEtcdclt/etcdinteraction"
 )
@@ -11,12 +10,12 @@ const (
 	argc2 = 2
 )
 
-func CMDClient() {
+func CMDClient() (string, error) {
 	flag.Parse()
 	argv := flag.Args()
-	action := parseCmdAction(argv)
 	config := etcdinteraction.GetEtcdClientConfig("../../etcdClientConfig.json")
-	fmt.Println(etcdinteraction.ExecuteAction(action, etcdinteraction.GetEtcdClient(config)))
+
+	return etcdinteraction.ExecuteAction(parseCmdAction(argv), etcdinteraction.GetEtcdClient(config))
 }
 
 func parseCmdAction(argv []string) etcdinteraction.EtcdActionInterface {
