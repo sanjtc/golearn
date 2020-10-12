@@ -1,14 +1,12 @@
 package main
 
 import (
-	"bytes"
-	"io/ioutil"
 	"log"
-	"net/http"
 	"path"
 	"strings"
 
-	"github.com/PuerkitoBio/goquery"
+	"github.com/pantskun/golearn/CrawlerDemo/crawler"
+	"github.com/pantskun/golearn/CrawlerDemo/etcd"
 	"golang.org/x/net/html"
 )
 
@@ -52,27 +50,8 @@ func FilterURL(urls []string, filters ...URLFilter) []string {
 
 func main() {
 	url := "https://www.ssetech.com.cn/"
+	nodes := crawler.GetElementNodesFromURL(url, "a")
 
-	resp, err := http.Get(url)
-	if err != nil {
-		log.Println(err)
-	}
-
-	body, err := ioutil.ReadAll(resp.Body)
-	resp.Body.Close()
-
-	if err != nil {
-		log.Println(err)
-	}
-
-	doc, err := goquery.NewDocumentFromReader(bytes.NewBuffer(body))
-	if err != nil {
-		log.Println(err)
-	}
-
-	log.Println("--------------get url start--------------")
-
-	nodes := doc.Find("a").Nodes
 	urls := []string{}
 
 	for _, n := range nodes {
@@ -80,9 +59,6 @@ func main() {
 		log.Println("Name: ", n.Data, " herf: ", url)
 		urls = append(urls, url)
 	}
-
-	log.Println("--------------get url end--------------")
-	log.Println("--------------filter url start--------------")
 
 	urlPrefixFilter := func(url string) bool {
 		if strings.HasPrefix(url, "http://") || strings.HasPrefix(url, "https://") {
@@ -103,5 +79,5 @@ func main() {
 		log.Println(url)
 	}
 
-	log.Println("--------------filter url end--------------")
+	interactor := etcd.NewInteractor()
 }
