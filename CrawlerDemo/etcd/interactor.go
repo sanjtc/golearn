@@ -2,6 +2,7 @@ package etcd
 
 import (
 	"fmt"
+	"os"
 
 	"github.com/coreos/etcd/clientv3"
 )
@@ -25,5 +26,5 @@ func (err *InteractorError) Error() string {
 }
 
 func NewInteractor() Interactor {
-
+	os.Getwd()
 }
