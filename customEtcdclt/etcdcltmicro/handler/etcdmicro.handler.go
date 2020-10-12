@@ -17,8 +17,9 @@ func (*EtcdcltMicro) Call(ctx context.Context, req *proto.Request, rep *proto.Re
 	client := etcdinteraction.GetEtcdClient(config)
 	msg, err := etcdinteraction.ExecuteAction(action, client)
 	rep.Msg = msg
+	rep.Err = err.Error()
 
-	return err
+	return nil
 }
 
 func getEtcdAction(req *proto.Request) etcdinteraction.EtcdActionInterface {
