@@ -16,8 +16,11 @@ func (*EtcdcltMicro) Call(ctx context.Context, req *proto.Request, rep *proto.Re
 	config := etcdinteraction.GetEtcdClientConfig("../../etcdClientConfig.json")
 	client := etcdinteraction.GetEtcdClient(config)
 	msg, err := etcdinteraction.ExecuteAction(action, client)
+
 	rep.Msg = msg
-	rep.Err = err.Error()
+	if err != nil {
+		rep.Err = err.Error()
+	}
 
 	return nil
 }
