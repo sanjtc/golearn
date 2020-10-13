@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"path"
 	"strings"
@@ -37,11 +36,11 @@ func main() {
 
 	urls = crawler.FilterURL(urls, urlPrefixFilter, urlHTMLFilter)
 
-	for _, url := range urls {
-		log.Println(url)
-	}
-
+	// interactor := etcd.NewInteractorWithEmbed()
 	interactor := etcd.NewInteractor()
+	if interactor == nil {
+		return
+	}
 	defer interactor.Close()
 
 	for _, url := range urls {
@@ -58,7 +57,12 @@ func main() {
 				continue
 			}
 
-			fmt.Println(url)
+			log.Println(url)
+
+			err = crawler.DownloadURL(url)
+			if err != nil {
+				log.Println(err)
+			}
 		}
 	}
 }

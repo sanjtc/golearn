@@ -1,6 +1,8 @@
 package crawler
 
-import "os"
+import (
+	"github.com/pantskun/golearn/CrawlerDemo/pathutils"
+)
 
 type HTMLFile struct {
 	Path    string
@@ -8,7 +10,7 @@ type HTMLFile struct {
 }
 
 func (f *HTMLFile) Write() error {
-	file, err := os.Create(f.Path)
+	file, err := pathutils.CreateFile(f.Path)
 	if err != nil {
 		return err
 	}

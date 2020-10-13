@@ -79,7 +79,7 @@ func DownloadURL(url string) error {
 	}
 	defer rsp.Body.Close()
 
-	path := pathutils.GetModulePath() + "downlaod" + pathutils.GetURLPath(url)
+	path := pathutils.GetModulePath() + "/download/" + pathutils.GetURLPath(url)
 
 	body, err := ioutil.ReadAll(rsp.Body)
 	if err != nil {

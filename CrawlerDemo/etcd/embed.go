@@ -2,6 +2,7 @@ package etcd
 
 import (
 	"io/ioutil"
+	"log"
 	"os"
 
 	"github.com/coreos/etcd/embed"
@@ -15,6 +16,7 @@ type embedetcd struct {
 func newEmbedetcd() *embedetcd {
 	tdir, err := ioutil.TempDir(os.TempDir(), "embedetcd")
 	if err != nil {
+		log.Println(err)
 		return nil
 	}
 
@@ -23,6 +25,7 @@ func newEmbedetcd() *embedetcd {
 
 	e, err := embed.StartEtcd(cfg)
 	if err != nil {
+		log.Println(err)
 		return nil
 	}
 

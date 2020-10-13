@@ -7,6 +7,7 @@ import (
 
 	"github.com/coreos/etcd/clientv3"
 	"github.com/coreos/etcd/etcdserver/api/v3client"
+	"github.com/pantskun/golearn/CrawlerDemo/pathutils"
 )
 
 const timeoutSecond = 5.0
@@ -30,7 +31,7 @@ type InteractorError struct {
 	msg string
 }
 
-func NewInteractor() Interactor {
+func NewInteractorWithEmbed() Interactor {
 	e := newEmbedetcd()
 	if e == nil {
 		return nil
@@ -41,8 +42,23 @@ func NewInteractor() Interactor {
 	return &interactor{e, c}
 }
 
+func NewInteractor() Interactor {
+	configPath := pathutils.GetModulePath() + "/configs/etcdConfig.json"
+	config := GetClientConfig(configPath)
+
+	c, err := clientv3.New(config)
+	if err != nil {
+		return nil
+	}
+
+	return &interactor{nil, c}
+}
+
 func (i *interactor) Close() {
-	i.e.close()
+	if i.e != nil {
+		i.e.close()
+	}
+
 	i.c.Close()
 }
 
