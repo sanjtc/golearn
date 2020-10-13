@@ -36,8 +36,8 @@ func main() {
 
 	urls = crawler.FilterURL(urls, urlPrefixFilter, urlHTMLFilter)
 
-	// interactor := etcd.NewInteractorWithEmbed()
-	interactor := etcd.NewInteractor()
+	interactor := etcd.NewInteractorWithEmbed()
+	// interactor := etcd.NewInteractor()
 	if interactor == nil {
 		return
 	}
