@@ -2,16 +2,18 @@ package crawler
 
 import (
 	"bytes"
+	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
 
 	"github.com/PuerkitoBio/goquery"
+	"github.com/pantskun/golearn/CrawlerDemo/pathutils"
 	"golang.org/x/net/html"
 )
 
 func GetElementNodesFromURL(url string, element string) []*html.Node {
-	resp, err := http.Get(url)
+	resp, err := http.Get(fmt.Sprint(url))
 	if err != nil {
 		log.Println(err)
 	}
@@ -68,4 +70,23 @@ func FilterURL(urls []string, filters ...URLFilter) []string {
 	}
 
 	return result
+}
+
+func DownloadURL(url string) error {
+	rsp, err := http.Get(fmt.Sprint(url))
+	if err != nil {
+		return err
+	}
+	defer rsp.Body.Close()
+
+	path := pathutils.GetModulePath() + "downlaod" + pathutils.GetURLPath(url)
+
+	body, err := ioutil.ReadAll(rsp.Body)
+	if err != nil {
+		return err
+	}
+
+	file := HTMLFile{Path: path, Content: body}
+
+	return file.Write()
 }

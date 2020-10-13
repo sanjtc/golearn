@@ -3,11 +3,10 @@ package etcd
 import (
 	"context"
 	"fmt"
-	"os"
-	"path"
 	"time"
 
 	"github.com/coreos/etcd/clientv3"
+	"github.com/coreos/etcd/etcdserver/api/v3client"
 )
 
 const timeoutSecond = 5.0
@@ -16,10 +15,13 @@ type Interactor interface {
 	Get(key string) (string, error)
 	Put(key string, value string) error
 	Del(key string) error
+
+	Close()
 }
 
 type interactor struct {
-	client *clientv3.Client
+	e *embedetcd
+	c *clientv3.Client
 }
 
 var _ Interactor = (*interactor)(nil)
@@ -28,11 +30,27 @@ type InteractorError struct {
 	msg string
 }
 
+func NewInteractor() Interactor {
+	e := newEmbedetcd()
+	if e == nil {
+		return nil
+	}
+
+	c := v3client.New(e.etcd.Server)
+
+	return &interactor{e, c}
+}
+
+func (i *interactor) Close() {
+	i.e.close()
+	i.c.Close()
+}
+
 func (i *interactor) Get(key string) (string, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), timeoutSecond*time.Second)
 	defer cancel()
 
-	rsp, err := i.client.Get(ctx, key)
+	rsp, err := i.c.Get(ctx, key)
 	if err != nil {
 		return "", err
 	}
@@ -48,7 +66,7 @@ func (i *interactor) Put(key string, value string) error {
 	ctx, cancel := context.WithTimeout(context.Background(), timeoutSecond*time.Second)
 	defer cancel()
 
-	_, err := i.client.Put(ctx, key, value)
+	_, err := i.c.Put(ctx, key, value)
 	if err != nil {
 		return err
 	}
@@ -60,7 +78,7 @@ func (i *interactor) Del(key string) error {
 	ctx, cancel := context.WithTimeout(context.Background(), timeoutSecond*time.Second)
 	defer cancel()
 
-	_, err := i.client.Delete(ctx, key)
+	_, err := i.c.Delete(ctx, key)
 	if err != nil {
 		return err
 	}
@@ -70,21 +88,4 @@ func (i *interactor) Del(key string) error {
 
 func (err *InteractorError) Error() string {
 	return fmt.Sprintln(err.msg)
-}
-
-func NewInteractor() Interactor {
-	configFile := GetModulePath() + "configs/etcdConfig.json"
-	config := GetClientConfig(configFile)
-	client, _ := clientv3.New(config)
-
-	return &interactor{client}
-}
-
-func NewInteractorWithClient(client *clientv3.Client) Interactor {
-	return &interactor{client}
-}
-
-func GetModulePath() string {
-	filePath, _ := os.Getwd()
-	return path.Dir(filePath)
 }
