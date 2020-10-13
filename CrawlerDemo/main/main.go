@@ -45,6 +45,12 @@ func main() {
 	defer interactor.Close()
 
 	for _, url := range urls {
+		// lock
+		if err := interactor.Lock(); err != nil {
+			log.Println(err)
+			continue
+		}
+
 		res, err := interactor.Get(url)
 		if err != nil {
 			log.Println(err)
@@ -65,6 +71,12 @@ func main() {
 			}
 
 			fmt.Println(url)
+		}
+
+		// unlock
+		if err := interactor.Unlock(); err != nil {
+			log.Println(err)
+			continue
 		}
 	}
 }

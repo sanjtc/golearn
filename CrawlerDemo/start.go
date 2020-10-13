@@ -61,6 +61,9 @@ func main() {
 		log.Println(err)
 	}
 
+	// close etcd
+	etcdCmd.Process.Kill()
+
 	// check processes result
 	if needCheck && checkOuters(outers) {
 		log.Println("successed")
@@ -68,8 +71,6 @@ func main() {
 		log.Println("failed")
 	}
 
-	// close etcd
-	etcdCmd.Process.Kill()
 }
 
 func checkOuters(outers []bytes.Buffer) bool {
@@ -88,6 +89,7 @@ func checkOuters(outers []bytes.Buffer) bool {
 				continue
 			}
 			if maps[url] == 1 {
+				log.Println(url)
 				return false
 			}
 		}

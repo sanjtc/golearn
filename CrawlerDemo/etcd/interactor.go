@@ -3,9 +3,11 @@ package etcd
 import (
 	"context"
 	"fmt"
+	"log"
 	"time"
 
 	"github.com/coreos/etcd/clientv3"
+	"github.com/coreos/etcd/clientv3/concurrency"
 	"github.com/coreos/etcd/etcdserver/api/v3client"
 	"github.com/pantskun/golearn/CrawlerDemo/pathutils"
 )
@@ -16,13 +18,16 @@ type Interactor interface {
 	Get(key string) (string, error)
 	Put(key string, value string) error
 	Del(key string) error
-
+	Lock() error
+	Unlock() error
 	Close()
 }
 
 type interactor struct {
 	e *embedetcd
 	c *clientv3.Client
+	s *concurrency.Session
+	m *concurrency.Mutex
 }
 
 var _ Interactor = (*interactor)(nil)
@@ -39,7 +44,15 @@ func NewInteractorWithEmbed() Interactor {
 
 	c := v3client.New(e.etcd.Server)
 
-	return &interactor{e, c}
+	// new seesion, new mutex
+	s, ce := concurrency.NewSession(c)
+	if ce != nil {
+		log.Println(ce)
+		return nil
+	}
+	m := concurrency.NewMutex(s, "/my-lock/")
+
+	return &interactor{e, c, s, m}
 }
 
 func NewInteractor() Interactor {
@@ -51,7 +64,15 @@ func NewInteractor() Interactor {
 		return nil
 	}
 
-	return &interactor{nil, c}
+	// new seesion, new mutex
+	s, ce := concurrency.NewSession(c)
+	if ce != nil {
+		log.Println(ce)
+		return nil
+	}
+	m := concurrency.NewMutex(s, "/my-lock/")
+
+	return &interactor{nil, c, s, m}
 }
 
 func (i *interactor) Close() {
@@ -60,15 +81,37 @@ func (i *interactor) Close() {
 	}
 
 	i.c.Close()
+	i.s.Close()
+}
+
+func (i *interactor) Lock() error {
+	ctx, _ := context.WithTimeout(context.Background(), timeoutSecond*time.Second)
+
+	err := i.m.Lock(ctx)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (i *interactor) Unlock() error {
+	ctx, _ := context.WithTimeout(context.Background(), timeoutSecond*time.Second)
+
+	err := i.m.Unlock(ctx)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 func (i *interactor) Get(key string) (string, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), timeoutSecond*time.Second)
 	defer cancel()
 
-	rsp, err := i.c.Get(ctx, key)
-	if err != nil {
-		return "", err
+	rsp, ge := i.c.Get(ctx, key)
+	if ge != nil {
+		return "", ge
 	}
 
 	if len(rsp.Kvs) == 0 {
