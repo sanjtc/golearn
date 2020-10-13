@@ -5,9 +5,12 @@ import (
 	"strings"
 )
 
+const ModuleName = "CrawlerDemo"
+
 func GetModulePath() string {
 	fp, _ := os.Getwd()
 	fp = ConvertBackslashToSlash(fp)
+	fp = strings.SplitAfter(fp, ModuleName)[0]
 
 	return fp
 }
