@@ -38,15 +38,15 @@ func main() {
 	urls = crawler.FilterURL(urls, urlPrefixFilter, urlHTMLFilter)
 
 	// interactor := etcd.NewInteractorWithEmbed()
-	interactor := etcd.NewInteractor()
-	if interactor == nil {
+	interactor, err := etcd.NewInteractor()
+	if err != nil {
 		return
 	}
 	defer interactor.Close()
 
 	for _, url := range urls {
 		// lock
-		if err := interactor.Lock(); err != nil {
+		if _, err := interactor.Lock(); err != nil {
 			log.Println(err)
 			return
 		}
