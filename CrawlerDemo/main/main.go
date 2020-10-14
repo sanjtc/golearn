@@ -73,7 +73,7 @@ func main() {
 			fmt.Println(url)
 		}
 
-		// unlock
+		// unlok
 		if err := interactor.Unlock(); err != nil {
 			log.Println(err)
 			continue
