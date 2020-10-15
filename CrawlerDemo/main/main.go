@@ -40,6 +40,7 @@ func main() {
 	// interactor := etcd.NewInteractorWithEmbed()
 	interactor, err := etcd.NewInteractor()
 	if err != nil {
+		log.Println(err)
 		return
 	}
 	defer interactor.Close()
