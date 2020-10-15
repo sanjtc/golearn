@@ -13,11 +13,11 @@ type embedetcd struct {
 	etcd    *embed.Etcd
 }
 
-func newEmbedetcd() *embedetcd {
+func newEmbedetcd() (*embedetcd, error) {
 	tdir, err := ioutil.TempDir(os.TempDir(), "embedetcd")
 	if err != nil {
 		log.Println(err)
-		return nil
+		return nil, err
 	}
 
 	cfg := embed.NewConfig()
@@ -25,11 +25,10 @@ func newEmbedetcd() *embedetcd {
 
 	e, err := embed.StartEtcd(cfg)
 	if err != nil {
-		log.Println(err)
-		return nil
+		return nil, err
 	}
 
-	return &embedetcd{tempdir: tdir, etcd: e}
+	return &embedetcd{tempdir: tdir, etcd: e}, nil
 }
 
 func (e *embedetcd) close() {

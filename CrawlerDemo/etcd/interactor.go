@@ -18,8 +18,8 @@ type Interactor interface {
 	Get(key string) (string, error)
 	Put(key string, value string) error
 	Del(key string) error
-	Lock() error
-	Unlock() error
+	Lock() (context.CancelFunc, error)
+	Unlock() (context.CancelFunc, error)
 	Close()
 }
 
@@ -36,43 +36,50 @@ type InteractorError struct {
 	msg string
 }
 
-func NewInteractorWithEmbed() Interactor {
-	e := newEmbedetcd()
+func NewInteractorWithEmbed() (Interactor, error) {
+	e, err := newEmbedetcd()
 	if e == nil {
-		return nil
+		return nil, err
 	}
 
 	c := v3client.New(e.etcd.Server)
 
 	// new seesion, new mutex
-	s, ce := concurrency.NewSession(c)
+	ctx, cancel := context.WithTimeout(context.Background(), timeoutSecond*time.Second)
+	defer cancel()
+
+	s, ce := concurrency.NewSession(c, concurrency.WithContext(ctx))
 	if ce != nil {
-		log.Println(ce)
-		return nil
+		return nil, ce
 	}
+
 	m := concurrency.NewMutex(s, "/my-lock/")
 
-	return &interactor{e, c, s, m}
+	return &interactor{e, c, s, m}, nil
 }
 
-func NewInteractor() Interactor {
+func NewInteractor() (Interactor, error) {
 	configPath := pathutils.GetModulePath() + "/configs/etcdConfig.json"
 	config := GetClientConfig(configPath)
 
 	c, err := clientv3.New(config)
 	if err != nil {
-		return nil
+		return nil, err
 	}
 
 	// new seesion, new mutex
-	s, ce := concurrency.NewSession(c)
+	ctx, cancel := context.WithTimeout(context.Background(), timeoutSecond*time.Second)
+	defer cancel()
+
+	s, ce := concurrency.NewSession(c, concurrency.WithContext(ctx))
 	if ce != nil {
 		log.Println(ce)
-		return nil
+		return nil, ce
 	}
+
 	m := concurrency.NewMutex(s, "/my-lock/")
 
-	return &interactor{nil, c, s, m}
+	return &interactor{nil, c, s, m}, nil
 }
 
 func (i *interactor) Close() {
@@ -84,25 +91,26 @@ func (i *interactor) Close() {
 	i.s.Close()
 }
 
-func (i *interactor) Lock() error {
-	ctx, _ := context.WithTimeout(context.Background(), timeoutSecond*time.Second)
+func (i *interactor) Lock() (context.CancelFunc, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), timeoutSecond*time.Second)
 
 	err := i.m.Lock(ctx)
 	if err != nil {
-		return err
+		return cancel, err
 	}
 
-	return nil
+	return cancel, nil
 }
 
-func (i *interactor) Unlock() error {
-	ctx, _ := context.WithTimeout(context.Background(), timeoutSecond*time.Second)
+func (i *interactor) Unlock() (context.CancelFunc, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), timeoutSecond*time.Second)
 
 	err := i.m.Unlock(ctx)
 	if err != nil {
-		return err
+		return cancel, err
 	}
-	return nil
+
+	return cancel, nil
 }
 
 func (i *interactor) Get(key string) (string, error) {
