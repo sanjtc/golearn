@@ -40,6 +40,7 @@ func main() {
 	// interactor := etcd.NewInteractorWithEmbed()
 	interactor, err := etcd.NewInteractor()
 	if err != nil {
+		log.Println(err)
 		return
 	}
 	defer interactor.Close()
@@ -70,7 +71,7 @@ func main() {
 			needDownload = true
 		}
 		// unlock
-		if err, _ := interactor.Unlock(); err != nil {
+		if _, err := interactor.Unlock(); err != nil {
 			log.Println(err)
 			return
 		}

@@ -12,7 +12,7 @@ import (
 	"github.com/pantskun/golearn/CrawlerDemo/pathutils"
 )
 
-const timeoutSecond = 5.0
+const timeoutSecond = 10.0
 
 type Interactor interface {
 	Get(key string) (string, error)
