@@ -19,7 +19,7 @@ type Interactor interface {
 	Put(key string, value string) error
 	Del(key string) error
 	Lock() (context.CancelFunc, error)
-	Unlock() error
+	Unlock() (context.CancelFunc, error)
 	Close()
 }
 
@@ -102,15 +102,15 @@ func (i *interactor) Lock() (context.CancelFunc, error) {
 	return cancel, nil
 }
 
-func (i *interactor) Unlock() error {
-	ctx, _ := context.WithTimeout(context.Background(), timeoutSecond*time.Second)
+func (i *interactor) Unlock() (context.CancelFunc, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), timeoutSecond*time.Second)
 
 	err := i.m.Unlock(ctx)
 	if err != nil {
-		return err
+		return cancel, err
 	}
 
-	return nil
+	return cancel, nil
 }
 
 func (i *interactor) Get(key string) (string, error) {

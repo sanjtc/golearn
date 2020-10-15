@@ -70,7 +70,7 @@ func main() {
 			needDownload = true
 		}
 		// unlock
-		if err := interactor.Unlock(); err != nil {
+		if err, _ := interactor.Unlock(); err != nil {
 			log.Println(err)
 			return
 		}
