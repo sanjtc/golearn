@@ -8,6 +8,8 @@ require (
 	github.com/coreos/go-semver v0.3.0 // indirect
 	github.com/coreos/go-systemd v0.0.0-20191104093116-d3cd4ed1dbcf // indirect
 	github.com/coreos/pkg v0.0.0-20180928190104-399ea9e2e55f // indirect
+	github.com/dvyukov/go-fuzz v0.0.0-20201003075337-90825f39c90b // indirect
+	github.com/elazarl/go-bindata-assetfs v1.0.1 // indirect
 	github.com/golang/protobuf v1.4.2
 	github.com/gorilla/websocket v1.4.2 // indirect
 	github.com/grpc-ecosystem/go-grpc-middleware v1.2.2 // indirect
@@ -20,6 +22,7 @@ require (
 	github.com/miekg/dns v1.1.31 // indirect
 	github.com/prometheus/client_golang v1.7.1 // indirect
 	github.com/soheilhy/cmux v0.1.4 // indirect
+	github.com/stephens2424/writerset v1.0.2 // indirect
 	github.com/tmc/grpc-websocket-proxy v0.0.0-20200427203606-3cfed13b9966 // indirect
 	github.com/ulikunitz/xz v0.5.8 // indirect
 	github.com/xanzy/go-gitlab v0.38.1 // indirect
