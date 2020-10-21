@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"fmt"
 	"os/exec"
+	"path"
 	"strings"
 
 	"github.com/pantskun/pathlib"
@@ -36,7 +37,7 @@ func main() {
 		}
 	}
 
-	mainPath := pathlib.GetModulePath("CrawlerDemo") + "/main/main.go"
+	mainPath := path.Join(pathlib.GetModulePath("CrawlerDemo"), "main", "main.go")
 	waiters := make([]chan int, n)
 	outers := make([]bytes.Buffer, n)
 
