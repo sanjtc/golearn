@@ -2,7 +2,7 @@ package main
 
 import (
 	"bytes"
-	"log"
+	"fmt"
 	"os/exec"
 	"strings"
 
@@ -14,19 +14,22 @@ const n = 6
 func main() {
 	// start etcd
 	etcdCmd := exec.Command("etcd")
+	var etcdOut bytes.Buffer
+	etcdCmd.Stdout = &etcdOut
 
 	go func() {
 		err := etcdCmd.Run()
 		if err != nil {
-			log.Println(err)
+			fmt.Println(err)
 		}
+		fmt.Println(etcdOut)
 	}()
 
 	// start n processes
 	execCmd := func(cmd *exec.Cmd, s chan int) {
 		err := cmd.Run()
 		if err != nil {
-			log.Println(err)
+			fmt.Println(err)
 			s <- 0
 		} else {
 			s <- 1
@@ -63,7 +66,7 @@ func main() {
 
 	err := etcdctlCmd.Run()
 	if err != nil {
-		log.Println(err)
+		fmt.Println(err)
 	}
 
 	// close etcd
@@ -71,9 +74,9 @@ func main() {
 
 	// check processes result
 	if needCheck && checkOuters(outers) {
-		log.Println("successed")
+		fmt.Println("successed")
 	} else {
-		log.Println("failed")
+		fmt.Println("failed")
 	}
 }
 
@@ -96,7 +99,7 @@ func checkOuters(outers []bytes.Buffer) bool {
 			}
 
 			if maps[url] == 1 {
-				log.Println(url)
+				fmt.Println(url)
 				return false
 			}
 		}

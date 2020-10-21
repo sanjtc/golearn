@@ -5,18 +5,10 @@ import (
 
 	"github.com/pantskun/pathlib"
 	"github.com/pantskun/remotelib/remotesftp"
+	"github.com/pantskun/remotelib/remotessh"
 )
 
-func TestStart(t *testing.T) {
-	// build main
-	// buildCmd := exec.Command("go", "build", "./main/")
-	// buildCmd.Dir = pathlib.GetModulePath("CrawlerDemo")
-
-	// err := buildCmd.Run()
-	// if err != nil {
-	// 	t.Fatal(err)
-	// }
-
+func TestUploadSrc(t *testing.T) {
 	sftpConfig := remotesftp.SFTPConfig{
 		Network:  "tcp",
 		IP:       "192.168.62.11",
@@ -34,4 +26,26 @@ func TestStart(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+}
+
+func TestRunSrc(t *testing.T) {
+	sshConfig := remotessh.SSHConfig{
+		Network:  "tcp",
+		IP:       "192.168.62.11",
+		Port:     "22",
+		User:     "wx",
+		Password: "1235",
+	}
+
+	sshInteractor, err := remotessh.NewInteractor(sshConfig)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	out, err := sshInteractor.Run("go run /home/wx/CrawlerDemo/start.go")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	t.Log(out)
 }
