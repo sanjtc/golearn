@@ -1,11 +1,9 @@
 package etcdinteraction
 
-import (
-	"fmt"
-)
-
 func Fuzz(data []byte) int {
 	l := len(data)
-	fmt.Println(l)
+	if l > 100 {
+		panic(l)
+	}
 	return 0
 }

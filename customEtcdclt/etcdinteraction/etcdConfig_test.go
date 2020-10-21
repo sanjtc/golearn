@@ -1,10 +1,12 @@
 package etcdinteraction
 
 import (
+	"os"
 	"testing"
 	"time"
 
 	"github.com/coreos/etcd/clientv3"
+	"golang.org/x/tools/go/packages"
 )
 
 func TestParseEtcdClientConfig(t *testing.T) {
@@ -50,5 +52,28 @@ func TestParseEtcdClientConfig(t *testing.T) {
 
 	if config := GetEtcdClientConfig("../errorEtcdClientConfig2.json"); !EqualConfig(config, defaultConfig) {
 		t.Error("exepected: ", defaultConfig, "got: ", config)
+	}
+}
+
+func TestTest(t *testing.T) {
+	cfg := new(packages.Config)
+	cfg.Env = os.Environ()
+	cfg.Mode = packages.LoadAllSyntax
+	// cfg.BuildFlags = []string{"-tags", "fuzz"}
+
+	pkgs, err := packages.Load(cfg, "./")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// t.Log(pkgs)
+
+	for _, pkg := range pkgs {
+		t.Log(pkg.Syntax)
+		s := pkg.Types.Scope()
+
+		for _, n := range s.Names() {
+			t.Log(n)
+		}
 	}
 }

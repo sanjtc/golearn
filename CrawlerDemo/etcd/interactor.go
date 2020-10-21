@@ -9,7 +9,7 @@ import (
 	"github.com/coreos/etcd/clientv3"
 	"github.com/coreos/etcd/clientv3/concurrency"
 	"github.com/coreos/etcd/etcdserver/api/v3client"
-	"github.com/pantskun/golearn/CrawlerDemo/pathutils"
+	"github.com/pantskun/pathlib"
 )
 
 const timeoutSecond = 10.0
@@ -59,7 +59,7 @@ func NewInteractorWithEmbed() (Interactor, error) {
 }
 
 func NewInteractor() (Interactor, error) {
-	configPath := pathutils.GetModulePath() + "/configs/etcdConfig.json"
+	configPath := pathlib.GetModulePath("CrawlerDemo") + "/configs/etcdConfig.json"
 	config := GetClientConfig(configPath)
 
 	c, err := clientv3.New(config)

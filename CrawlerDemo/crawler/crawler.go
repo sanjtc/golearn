@@ -8,7 +8,7 @@ import (
 	"net/http"
 
 	"github.com/PuerkitoBio/goquery"
-	"github.com/pantskun/golearn/CrawlerDemo/pathutils"
+	"github.com/pantskun/pathlib"
 	"golang.org/x/net/html"
 )
 
@@ -79,7 +79,7 @@ func DownloadURL(url string) error {
 	}
 	defer rsp.Body.Close()
 
-	path := pathutils.GetModulePath() + "/download/" + pathutils.GetURLPath(url)
+	path := pathlib.GetModulePath("CrawlerDemo") + "/download/" + pathlib.GetURLPath(url)
 
 	body, err := ioutil.ReadAll(rsp.Body)
 	if err != nil {

@@ -38,22 +38,22 @@ func main() {
 	urls = crawler.FilterURL(urls, urlPrefixFilter, urlHTMLFilter)
 
 	// interactor := etcd.NewInteractorWithEmbed()
-	interactor, err := etcd.NewInteractor()
+	etcdInteractor, err := etcd.NewInteractor()
 	if err != nil {
 		log.Println(err)
 		return
 	}
-	defer interactor.Close()
+	defer etcdInteractor.Close()
 
 	for _, url := range urls {
 		// lock
-		if _, err := interactor.Lock(); err != nil {
+		if _, err := etcdInteractor.Lock(); err != nil {
 			log.Println(err)
 			return
 		}
 
 		// check url
-		res, err := interactor.Get(url)
+		res, err := etcdInteractor.Get(url)
 		if err != nil {
 			log.Println(err)
 			return
@@ -62,7 +62,7 @@ func main() {
 		needDownload := false
 
 		if res == "" {
-			err := interactor.Put(url, "1")
+			err := etcdInteractor.Put(url, "1")
 			if err != nil {
 				log.Println(err)
 				return
@@ -71,7 +71,7 @@ func main() {
 			needDownload = true
 		}
 		// unlock
-		if _, err := interactor.Unlock(); err != nil {
+		if _, err := etcdInteractor.Unlock(); err != nil {
 			log.Println(err)
 			return
 		}

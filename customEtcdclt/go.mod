@@ -9,7 +9,6 @@ require (
 	github.com/coreos/go-systemd v0.0.0-20191104093116-d3cd4ed1dbcf // indirect
 	github.com/coreos/pkg v0.0.0-20180928190104-399ea9e2e55f // indirect
 	github.com/dvyukov/go-fuzz v0.0.0-20201003075337-90825f39c90b // indirect
-	github.com/elazarl/go-bindata-assetfs v1.0.1 // indirect
 	github.com/golang/protobuf v1.4.2
 	github.com/gorilla/websocket v1.4.2 // indirect
 	github.com/grpc-ecosystem/go-grpc-middleware v1.2.2 // indirect
@@ -20,9 +19,9 @@ require (
 	github.com/micro/go-micro/v3 v3.0.0-beta.3
 	github.com/micro/micro/v3 v3.0.0-beta.5.1
 	github.com/miekg/dns v1.1.31 // indirect
+	github.com/pantskun/pathlib v0.0.0-20201019020638-d9e1d0858138
 	github.com/prometheus/client_golang v1.7.1 // indirect
 	github.com/soheilhy/cmux v0.1.4 // indirect
-	github.com/stephens2424/writerset v1.0.2 // indirect
 	github.com/tmc/grpc-websocket-proxy v0.0.0-20200427203606-3cfed13b9966 // indirect
 	github.com/ulikunitz/xz v0.5.8 // indirect
 	github.com/xanzy/go-gitlab v0.38.1 // indirect
@@ -34,7 +33,7 @@ require (
 	golang.org/x/oauth2 v0.0.0-20200902213428-5d25da1a8d43 // indirect
 	golang.org/x/sys v0.0.0-20200930185726-fdedc70b468f // indirect
 	golang.org/x/time v0.0.0-20200630173020-3af7569d3a1e // indirect
-	golang.org/x/tools v0.0.0-20201014231627-1610a49f37af // indirect
+	golang.org/x/tools v0.0.0-20201014231627-1610a49f37af
 	google.golang.org/genproto v0.0.0-20201001141541-efaab9d3c4f7 // indirect
 	google.golang.org/protobuf v1.25.0
 	gopkg.in/yaml.v3 v3.0.0-20200615113413-eeeca48fe776 // indirect

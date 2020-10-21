@@ -6,7 +6,7 @@ import (
 	"os/exec"
 	"strings"
 
-	"github.com/pantskun/golearn/CrawlerDemo/pathutils"
+	"github.com/pantskun/pathlib"
 )
 
 const n = 6
@@ -33,7 +33,7 @@ func main() {
 		}
 	}
 
-	mainPath := pathutils.GetModulePath() + "/main/main.go"
+	mainPath := pathlib.GetModulePath("CrawlerDemo") + "/main/main.go"
 	waiters := make([]chan int, n)
 	outers := make([]bytes.Buffer, n)
 
