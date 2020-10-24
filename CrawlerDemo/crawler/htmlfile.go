@@ -1,7 +1,9 @@
 package crawler
 
 import (
-	"github.com/pantskun/golearn/CrawlerDemo/pathutils"
+	"os"
+
+	"github.com/pantskun/commonutils/pathutils"
 )
 
 type HTMLFile struct {
@@ -10,7 +12,7 @@ type HTMLFile struct {
 }
 
 func (f *HTMLFile) Write() error {
-	file, err := pathutils.CreateFile(f.Path)
+	file, err := CreateFile(f.Path)
 	if err != nil {
 		return err
 	}
@@ -23,4 +25,15 @@ func (f *HTMLFile) Write() error {
 	file.Close()
 
 	return nil
+}
+
+func CreateFile(fp string) (*os.File, error) {
+	p := pathutils.GetParentPath(fp)
+
+	err := os.MkdirAll(p, os.ModePerm)
+	if err != nil {
+		return nil, err
+	}
+
+	return os.Create(fp)
 }

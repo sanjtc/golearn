@@ -11,7 +11,10 @@
             "mode": "auto",
             "program": "${fileDirname}",
             "env": {},
-            "args": []
+            "args": [
+                "-n",
+                "4"
+            ]
         }
     ]
 }

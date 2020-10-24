@@ -1,9 +1,11 @@
 package main
 
 import (
+	"net"
 	"testing"
+	"time"
 
-	"github.com/pantskun/pathlib"
+	"github.com/pantskun/commonutils/pathutils"
 	"github.com/pantskun/remotelib/remotesftp"
 	"github.com/pantskun/remotelib/remotessh"
 )
@@ -22,7 +24,7 @@ func TestUploadSrc(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	err = sftpInteractor.Upload(pathlib.GetModulePath("CrawlerDemo"), "/home/wx")
+	err = sftpInteractor.Upload(pathutils.GetModulePath("CrawlerDemo"), "/home/wx")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -42,10 +44,43 @@ func TestRunSrc(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	out, err := sshInteractor.Run("go run /home/wx/CrawlerDemo/start.go")
+	cmds := []string{
+		"cd /home/wx/CrawlerDemo",
+		"go run start.go -n 4",
+	}
+
+	out, err := sshInteractor.Run(cmds)
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	t.Log(out)
+}
+
+func TestChan(t *testing.T) {
+	ch := make(chan struct{})
+
+	wait := func() <-chan struct{} {
+		return ch
+	}
+
+	go func() {
+		<-wait()
+		t.Log("success")
+	}()
+
+	time.Sleep(5 * time.Second)
+
+	ch <- struct{}{}
+}
+
+func TestListenRemoteInterrupt(t *testing.T) {
+	ch := make(chan int)
+	if err := listenRemoteInterrupt(ch); err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestAddr(t *testing.T) {
+	t.Log(net.Interfaces())
 }

@@ -8,7 +8,6 @@ require (
 	github.com/coreos/go-semver v0.3.0 // indirect
 	github.com/coreos/go-systemd v0.0.0-20191104093116-d3cd4ed1dbcf // indirect
 	github.com/coreos/pkg v0.0.0-20180928190104-399ea9e2e55f // indirect
-	github.com/dvyukov/go-fuzz v0.0.0-20201003075337-90825f39c90b // indirect
 	github.com/golang/protobuf v1.4.2
 	github.com/gorilla/websocket v1.4.2 // indirect
 	github.com/grpc-ecosystem/go-grpc-middleware v1.2.2 // indirect
@@ -19,7 +18,6 @@ require (
 	github.com/micro/go-micro/v3 v3.0.0-beta.3
 	github.com/micro/micro/v3 v3.0.0-beta.5.1
 	github.com/miekg/dns v1.1.31 // indirect
-	github.com/pantskun/pathlib v0.0.0-20201019020638-d9e1d0858138
 	github.com/prometheus/client_golang v1.7.1 // indirect
 	github.com/soheilhy/cmux v0.1.4 // indirect
 	github.com/tmc/grpc-websocket-proxy v0.0.0-20200427203606-3cfed13b9966 // indirect
