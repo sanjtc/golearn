@@ -2,10 +2,12 @@ package etcdinteraction
 
 import (
 	"os"
+	"path"
 	"testing"
 	"time"
 
 	"github.com/coreos/etcd/clientv3"
+	"github.com/pantskun/commonutils/pathutils"
 	"golang.org/x/tools/go/packages"
 )
 
@@ -38,19 +40,21 @@ func TestParseEtcdClientConfig(t *testing.T) {
 		return true
 	}
 
+	modulePath := pathutils.GetModulePath("customEtcdclt")
+
 	if config := GetEtcdClientConfig(""); !EqualConfig(config, defaultConfig) {
 		t.Error("exepected: ", defaultConfig, "got: ", config)
 	}
 
-	if config := GetEtcdClientConfig("../etcdClientConfig.json"); EqualConfig(config, defaultConfig) {
+	if config := GetEtcdClientConfig(path.Join(modulePath, "configs/etcdClientConfig.json")); EqualConfig(config, defaultConfig) {
 		t.Error("got default config")
 	}
 
-	if config := GetEtcdClientConfig("../errorEtcdClientConfig.json"); !EqualConfig(config, defaultConfig) {
+	if config := GetEtcdClientConfig(path.Join(modulePath, "configs/errorEtcdClientConfig.json")); !EqualConfig(config, defaultConfig) {
 		t.Error("exepected: ", defaultConfig, "got: ", config)
 	}
 
-	if config := GetEtcdClientConfig("../errorEtcdClientConfig2.json"); !EqualConfig(config, defaultConfig) {
+	if config := GetEtcdClientConfig(path.Join(modulePath, "configs/errorEtcdClientConfig2.json")); !EqualConfig(config, defaultConfig) {
 		t.Error("exepected: ", defaultConfig, "got: ", config)
 	}
 }

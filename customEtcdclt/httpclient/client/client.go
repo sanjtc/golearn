@@ -8,8 +8,10 @@ import (
 	"net/url"
 	"os"
 	"os/signal"
+	"path"
 	"sync"
 
+	"github.com/pantskun/commonutils/pathutils"
 	"github.com/pantskun/golearn/customEtcdclt/etcdinteraction"
 )
 
@@ -79,7 +81,7 @@ func deleteRequestHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func execActionAndWriteResponse(action etcdinteraction.EtcdActionInterface, w http.ResponseWriter) {
-	config := etcdinteraction.GetEtcdClientConfig("../../etcdClientConfig.json")
+	config := etcdinteraction.GetEtcdClientConfig(path.Join(pathutils.GetModulePath("customEtcdclt"), "configs/etcdClientConfig.json"))
 
 	msg, err := etcdinteraction.ExecuteAction(action, etcdinteraction.GetEtcdClient(config))
 	if err != nil {

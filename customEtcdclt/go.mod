@@ -8,21 +8,20 @@ require (
 	github.com/coreos/go-semver v0.3.0 // indirect
 	github.com/coreos/go-systemd v0.0.0-20191104093116-d3cd4ed1dbcf // indirect
 	github.com/coreos/pkg v0.0.0-20180928190104-399ea9e2e55f // indirect
-	github.com/golang/protobuf v1.4.2
+	github.com/golang/protobuf v1.4.3
 	github.com/gorilla/websocket v1.4.2 // indirect
 	github.com/grpc-ecosystem/go-grpc-middleware v1.2.2 // indirect
 	github.com/grpc-ecosystem/go-grpc-prometheus v1.2.0 // indirect
 	github.com/grpc-ecosystem/grpc-gateway v1.15.0 // indirect
-	github.com/hashicorp/go-retryablehttp v0.6.7 // indirect
 	github.com/jonboulle/clockwork v0.2.1 // indirect
 	github.com/micro/go-micro/v3 v3.0.0-beta.3
-	github.com/micro/micro/v3 v3.0.0-beta.5.1
+	github.com/micro/micro/v3 v3.0.0-beta.7
 	github.com/miekg/dns v1.1.31 // indirect
+	github.com/pantskun/commonutils v0.0.0-20201029072800-db911f0e7485
 	github.com/prometheus/client_golang v1.7.1 // indirect
 	github.com/soheilhy/cmux v0.1.4 // indirect
 	github.com/tmc/grpc-websocket-proxy v0.0.0-20200427203606-3cfed13b9966 // indirect
 	github.com/ulikunitz/xz v0.5.8 // indirect
-	github.com/xanzy/go-gitlab v0.38.1 // indirect
 	github.com/xiang90/probing v0.0.0-20190116061207-43a291ad63a2 // indirect
 	go.uber.org/multierr v1.6.0 // indirect
 	go.uber.org/zap v1.16.0 // indirect

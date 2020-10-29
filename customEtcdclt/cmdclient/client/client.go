@@ -2,7 +2,9 @@ package client
 
 import (
 	"flag"
+	"path"
 
+	"github.com/pantskun/commonutils/pathutils"
 	"github.com/pantskun/golearn/customEtcdclt/etcdinteraction"
 )
 
@@ -13,7 +15,8 @@ const (
 func CMDClient() (string, error) {
 	flag.Parse()
 	argv := flag.Args()
-	config := etcdinteraction.GetEtcdClientConfig("../../etcdClientConfig.json")
+	modulePath := pathutils.GetModulePath("customEtcdclt")
+	config := etcdinteraction.GetEtcdClientConfig(path.Join(modulePath, "configs/etcdClientConfig.json"))
 
 	return etcdinteraction.ExecuteAction(parseCmdAction(argv), etcdinteraction.GetEtcdClient(config))
 }

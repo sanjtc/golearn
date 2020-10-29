@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"context"
 	"flag"
 	"fmt"
 	"log"
@@ -10,6 +11,7 @@ import (
 	"path"
 	"strings"
 
+	"github.com/pantskun/commonutils/osutils"
 	"github.com/pantskun/commonutils/pathutils"
 )
 
@@ -19,35 +21,28 @@ func main() {
 
 	n := *procnum
 
-	// start etcd
-	etcdCmd := exec.Command("etcd")
-
-	var etcdOut bytes.Buffer
-	etcdCmd.Stdout = &etcdOut
+	startEtcdCmd := osutils.NewCommand("etcd")
 
 	go func() {
-		err := etcdCmd.Run()
-		if err != nil {
-			fmt.Println(err)
+		if err := startEtcdCmd.Run(); err != nil {
+			log.Println(err)
+			return
 		}
 
-		fmt.Println(etcdOut)
+		if stderr, err := startEtcdCmd.GetStderr(context.TODO()); err != nil {
+			log.Println(err)
+		} else {
+			log.Println(stderr)
+		}
 	}()
 
 	defer func() {
-		// clean url data
-		etcdctlCmd := exec.Command("etcdctl", "del", "--prefix", "https://")
-
-		var etcdctlOuter bytes.Buffer
-		etcdctlCmd.Stdout = &etcdctlOuter
-
-		err := etcdctlCmd.Run()
-		if err != nil {
-			fmt.Println(err)
+		delEtcdDataCmd := osutils.NewCommand("etcdctl", "del", "--prefix", "https://")
+		if err := delEtcdDataCmd.Run(); err != nil {
+			log.Println(err)
 		}
 
-		// close etcd
-		_ = etcdCmd.Process.Kill()
+		_ = startEtcdCmd.Kill()
 	}()
 
 	// start n processes
