@@ -6,6 +6,7 @@ import (
 	"path"
 	"strings"
 
+	"github.com/pantskun/commonutils/pathutils"
 	"github.com/pantskun/golearn/CrawlerDemo/crawler"
 	"github.com/pantskun/golearn/CrawlerDemo/etcd"
 )
@@ -78,7 +79,7 @@ func main() {
 
 		// download
 		if needDownload {
-			err = crawler.DownloadURL(url)
+			err = crawler.DownloadURL(url, path.Join(pathutils.GetModulePath("CrawlerDemo"), "download"))
 			if err != nil {
 				log.Println(err)
 				continue

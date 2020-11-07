@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"path"
 
 	"github.com/PuerkitoBio/goquery"
 	"github.com/pantskun/commonutils/pathutils"
@@ -72,21 +73,21 @@ func FilterURL(urls []string, filters ...URLFilter) []string {
 	return result
 }
 
-func DownloadURL(url string) error {
+func DownloadURL(url string, p string) error {
 	rsp, err := http.Get(fmt.Sprint(url))
 	if err != nil {
 		return err
 	}
 	defer rsp.Body.Close()
 
-	path := pathutils.GetModulePath("CrawlerDemo") + "/download/" + pathutils.GetURLPath(url)
+	filePath := path.Join(p, pathutils.GetURLPath(url))
 
 	body, err := ioutil.ReadAll(rsp.Body)
 	if err != nil {
 		return err
 	}
 
-	file := HTMLFile{Path: path, Content: body}
+	file := HTMLFile{Path: filePath, Content: body}
 
 	return file.Write()
 }

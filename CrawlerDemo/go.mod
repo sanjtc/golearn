@@ -20,9 +20,10 @@ require (
 	github.com/pantskun/remotelib v0.0.0-20201022142915-b4cf92002658
 	github.com/prometheus/client_golang v1.7.1 // indirect
 	github.com/soheilhy/cmux v0.1.4 // indirect
+	github.com/stretchr/testify v1.6.1
 	github.com/tmc/grpc-websocket-proxy v0.0.0-20200427203606-3cfed13b9966 // indirect
 	github.com/xiang90/probing v0.0.0-20190116061207-43a291ad63a2 // indirect
-	go.uber.org/zap v1.16.0 // indirect
+	go.uber.org/zap v1.16.0
 	golang.org/x/net v0.0.0-20200707034311-ab3426394381
 	golang.org/x/time v0.0.0-20200630173020-3af7569d3a1e // indirect
 	google.golang.org/genproto v0.0.0-20201009135657-4d944d34d83c // indirect
