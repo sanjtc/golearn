@@ -36,6 +36,10 @@ type InteractorError struct {
 	msg string
 }
 
+func (err *InteractorError) Error() string {
+	return fmt.Sprintln(err.msg)
+}
+
 func NewInteractorWithEmbed() (Interactor, error) {
 	e, err := newEmbedetcd()
 	if e == nil {
@@ -151,8 +155,4 @@ func (i *interactor) Del(key string) error {
 	}
 
 	return nil
-}
-
-func (err *InteractorError) Error() string {
-	return fmt.Sprintln(err.msg)
 }

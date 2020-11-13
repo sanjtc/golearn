@@ -2,51 +2,137 @@ package etcd
 
 import (
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
-func TestEtcdMutex(t *testing.T) {
-	i, err := NewInteractorWithEmbed()
-
-	if err != nil {
-		t.Log(err)
-		return
+func TestInteractorError(t *testing.T) {
+	type errorCase struct {
+		msg      string
+		expected string
 	}
 
-	defer i.Close()
-
-	_, err = i.Lock()
-	if err != nil {
-		t.Log(err)
-		return
+	testCases := []errorCase{
+		{msg: "msg", expected: "msg"},
 	}
 
-	t.Log("locked out")
-
-	go func() {
-		_, err := i.Lock()
-		if err != nil {
-			t.Log(err)
-			return
-		}
-
-		t.Log("locked in")
-
-		// time.Sleep(5 * time.Second)
-
-		_, err = i.Unlock()
-		if err != nil {
-			t.Log(err)
-			return
-		}
-
-		t.Log("unlocked in")
-	}()
-
-	_, err = i.Unlock()
-	if err != nil {
-		t.Log(err)
-		return
+	for _, testCase := range testCases {
+		err := InteractorError{testCase.msg}
+		got := err.Error()
+		assert.Equal(t, testCase.expected, got)
 	}
-
-	t.Log("unlocked out")
 }
+
+func TestNewInteractorWithEmbed(t *testing.T) {
+	interactor, err := NewInteractorWithEmbed()
+	if err != nil {
+		t.Log(err)
+		return
+	}
+	defer interactor.Close()
+
+	testPut(t, interactor)
+	testGet(t, interactor)
+	testDel(t, interactor)
+}
+
+func testPut(t *testing.T, interactor Interactor) {
+	type putCase struct {
+		key      string
+		value    string
+		expected error
+	}
+
+	testCases := []putCase{
+		{key: "key1", value: "value1", expected: nil},
+	}
+
+	for _, testCase := range testCases {
+		got := interactor.Put(testCase.key, testCase.value)
+		assert.Equal(t, testCase.expected, got)
+	}
+}
+
+func testGet(t *testing.T, interactor Interactor) {
+	type getCase struct {
+		key      string
+		expected string
+	}
+
+	testCases := []getCase{
+		{key: "key1", expected: "value1"},
+		{key: "key2", expected: ""},
+	}
+
+	for _, testCase := range testCases {
+		got, err := interactor.Get(testCase.key)
+		if err != nil {
+			t.Fatal()
+		}
+
+		assert.Equal(t, testCase.expected, got)
+	}
+}
+
+func testDel(t *testing.T, interactor Interactor) {
+	type delCase struct {
+		key      string
+		expected error
+	}
+
+	testCases := []delCase{
+		{key: "key1", expected: nil},
+	}
+
+	for _, testCase := range testCases {
+		got := interactor.Del(testCase.key)
+		assert.Equal(t, testCase.expected, got)
+	}
+}
+
+// func TestEtcdMutex(t *testing.T) {
+// 	i, err := NewInteractorWithEmbed()
+
+// 	if err != nil {
+// 		t.Log(err)
+// 		return
+// 	}
+
+// 	defer i.Close()
+
+// 	_, err = i.Lock()
+// 	if err != nil {
+// 		t.Log(err)
+// 		return
+// 	}
+
+// 	t.Log("locked out")
+
+// 	go func() {
+// 		_, err := i.Lock()
+// 		if err != nil {
+// 			t.Log(err)
+// 			return
+// 		}
+
+// 		t.Log("locked in")
+
+// 		// time.Sleep(5 * time.Second)
+
+// 		_, err = i.Unlock()
+// 		if err != nil {
+// 			t.Log(err)
+// 			return
+// 		}
+
+// 		t.Log("unlocked in")
+// 	}()
+
+// 	_, err = i.Unlock()
+// 	if err != nil {
+// 		t.Log(err)
+// 		return
+// 	}
+
+// 	t.Log("unlocked out")
+// }
