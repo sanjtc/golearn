@@ -8,6 +8,7 @@ import (
 
 	"github.com/pantskun/commonutils/osutils"
 	"github.com/pantskun/commonutils/pathutils"
+	"github.com/pantskun/commonutils/taskutils"
 	"github.com/pantskun/remotelib/remotesftp"
 	"github.com/pantskun/remotelib/remotessh"
 )
@@ -19,35 +20,64 @@ func main() {
 	signalChan := make(chan os.Signal)
 	osutils.ListenSystemSignalsWithCtx(ctx, cancel, signalChan, os.Interrupt)
 
-	taskChan := make(chan int)
+	taskPool := taskutils.NewTaskPool()
+	taskPool.Run()
 
-	go func() {
-		if err := UploadSrc(); err != nil {
-			log.Println(err)
-			return
+	uploadTask := taskutils.NewTask(
+		"uploadTask",
+		func() error {
+			log.Println("uploadTask start")
+
+			if err := UploadSrc(); err != nil {
+				return err
+			}
+
+			log.Println("uploadTask finished")
+			return nil
+		},
+	)
+	taskPool.AddTask(uploadTask)
+
+	runTask := taskutils.NewTask(
+		"runTask",
+		func() error {
+			log.Println("runTask start")
+
+			if err := RunSrc(); err != nil {
+				return err
+			}
+
+			log.Println("runTask finished")
+			return nil
+		},
+		uploadTask,
+	)
+	taskPool.AddTask(runTask)
+
+	// 等待任务完成，或者检测到中断发送中断到远程任务
+	for {
+		if uploadTask.GetState() == taskutils.ETaskStateFinished &&
+			runTask.GetState() == taskutils.ETaskStateFinished {
+			break
 		}
 
-		if err := RunSrc(); err != nil {
-			log.Println(err)
-			return
-		}
+		select {
+		case <-ctx.Done():
+			{
+				if err := ProcessInterrupt(); err != nil {
+					log.Println(err)
+				}
 
-		taskChan <- 0
-	}()
-
-	select {
-	case <-taskChan:
-		{
-			return
-		}
-	case <-ctx.Done():
-		{
-			if err := ProcessInterrupt(); err != nil {
-				log.Println(err)
-				return
+				break
+			}
+		default:
+			{
+				continue
 			}
 		}
 	}
+
+	taskPool.Close()
 }
 
 func UploadSrc() error {

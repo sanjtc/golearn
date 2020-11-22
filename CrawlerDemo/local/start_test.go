@@ -76,7 +76,7 @@ func TestChan(t *testing.T) {
 
 func TestListenRemoteInterrupt(t *testing.T) {
 	ch := make(chan int)
-	if err := listenRemoteInterrupt(ch); err != nil {
+	if err := listenRemoteInterrupt(":2233", ch); err != nil {
 		t.Fatal(err)
 	}
 }

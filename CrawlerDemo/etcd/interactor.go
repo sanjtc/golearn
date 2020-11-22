@@ -2,7 +2,6 @@ package etcd
 
 import (
 	"context"
-	"fmt"
 	"log"
 	"time"
 
@@ -37,7 +36,7 @@ type InteractorError struct {
 }
 
 func (err *InteractorError) Error() string {
-	return fmt.Sprintln(err.msg)
+	return err.msg
 }
 
 func NewInteractorWithEmbed() (Interactor, error) {

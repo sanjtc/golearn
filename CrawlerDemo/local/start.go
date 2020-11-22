@@ -1,13 +1,10 @@
 package main
 
 import (
-	"bytes"
-	"context"
 	"flag"
 	"fmt"
 	"log"
 	"net"
-	"os/exec"
 	"path"
 	"strings"
 
@@ -21,68 +18,57 @@ func main() {
 
 	n := *procnum
 
+	// 启动etcd
 	startEtcdCmd := osutils.NewCommand("etcd")
 
 	go func() {
-		if err := startEtcdCmd.Run(); err != nil {
-			log.Println(err)
+		startEtcdCmd.Run()
+
+		if startEtcdCmd.GetCmdState() == osutils.ECmdStateError {
+			log.Println(startEtcdCmd.GetCmdError())
 			return
 		}
 
-		if stderr, err := startEtcdCmd.GetStderr(context.TODO()); err != nil {
-			log.Println(err)
-		} else {
-			log.Println(stderr)
-		}
+		log.Println(startEtcdCmd.GetStdout())
 	}()
 
 	defer func() {
+		// 清除etcd数据，关闭etcd
 		delEtcdDataCmd := osutils.NewCommand("etcdctl", "del", "--prefix", "https://")
-		if err := delEtcdDataCmd.Run(); err != nil {
-			log.Println(err)
+		delEtcdDataCmd.Run()
+
+		if delEtcdDataCmd.GetCmdState() == osutils.ECmdStateError {
+			log.Println(delEtcdDataCmd.GetCmdError())
 		}
 
 		_ = startEtcdCmd.Kill()
 	}()
 
 	// start n processes
-	execCmd := func(cmd *exec.Cmd, s chan int) {
-		err := cmd.Run()
-		if err != nil {
-			fmt.Println(err)
-			s <- 0
-		} else {
-			s <- 1
-		}
-	}
-
 	mainPath := path.Join(pathutils.GetModulePath("CrawlerDemo"), "main", "main.go")
 	log.Println("work directory: ", mainPath)
 
-	waiters := make([]chan int, n)
-	outers := make([]bytes.Buffer, n)
-	cmds := make([]*exec.Cmd, n)
+	cmds := make([]osutils.Command, n)
 
 	for i := 0; i < n; i++ {
-		cmds[i] = exec.Command("go", "run", mainPath)
-		cmds[i].Stdout = &outers[i]
-		waiters[i] = make(chan int)
-
+		cmds[i] = osutils.NewCommand("go", "run", mainPath)
+		cmds[i].RunAsyn()
 		log.Println("start process ", i+1)
-
-		go execCmd(cmds[i], waiters[i])
 	}
 
-	// wait processes
+	// 等待多个进程执行完成
 	var needCheck bool = true
 
 	waitChan := make(chan int)
 	interruptChan := make(chan int)
 
 	waitProc := func() {
-		for _, waiter := range waiters {
-			s := <-waiter
-			if s == 0 {
+		for _, cmd := range cmds {
+			for cmd.GetCmdState() == osutils.ECmdStateRunning {
+			}
+
+			// 如果有cmd执行失败，则不进行check
+			if cmd.GetCmdState() == osutils.ECmdStateError {
 				needCheck = false
 			}
 		}
@@ -90,9 +76,9 @@ func main() {
 	}
 	go waitProc()
 
-	// process interrupt
+	// 处理远程中断
 	go func() {
-		err := listenRemoteInterrupt(interruptChan)
+		err := listenRemoteInterrupt(":2233", interruptChan)
 		if err != nil {
 			log.Println(err)
 		}
@@ -101,8 +87,8 @@ func main() {
 	select {
 	case <-waitChan:
 		{
-			// check processes result
-			if needCheck && checkOuters(outers) {
+			// 检查执行结果
+			if needCheck && checkCmds(cmds) {
 				fmt.Println("successed")
 			} else {
 				fmt.Println("failed")
@@ -116,7 +102,7 @@ func main() {
 				if cmd == nil {
 					continue
 				}
-				if err := cmd.Process.Kill(); err != nil {
+				if err := cmd. /*Process.*/ Kill(); err != nil {
 					log.Println(err)
 				}
 			}
@@ -124,12 +110,12 @@ func main() {
 	}
 }
 
-func checkOuters(outers []bytes.Buffer) bool {
-	n := len(outers)
+func checkCmds(cmds []osutils.Command) bool {
+	n := len(cmds)
 	outs := make([][]string, n)
 
 	for i := 0; i < n; i++ {
-		outs[i] = strings.Split(outers[i].String(), "\n")
+		outs[i] = strings.Split(cmds[i].GetStdout(), "\n")
 		outs[i] = outs[i][0 : len(outs[i])-1]
 	}
 
@@ -152,8 +138,8 @@ func checkOuters(outers []bytes.Buffer) bool {
 	return true
 }
 
-func listenRemoteInterrupt(interruptChan chan int) error {
-	listen, err := net.Listen("tcp", ":2233")
+func listenRemoteInterrupt(addr string, interruptChan chan int) error {
+	listen, err := net.Listen("tcp", addr)
 	if err != nil {
 		return err
 	}
