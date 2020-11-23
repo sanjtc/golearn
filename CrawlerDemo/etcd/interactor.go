@@ -11,7 +11,7 @@ import (
 	"github.com/pantskun/commonutils/pathutils"
 )
 
-const timeoutSecond = 10.0
+const timeoutSecond = 5.0
 
 type Interactor interface {
 	Get(key string) (string, error)
@@ -48,7 +48,7 @@ func NewInteractorWithEmbed() (Interactor, error) {
 	c := v3client.New(e.etcd.Server)
 
 	// new seesion, new mutex
-	ctx, cancel := context.WithTimeout(context.Background(), timeoutSecond*time.Second)
+	ctx, cancel := context.WithTimeout(context.TODO(), timeoutSecond*time.Second)
 	defer cancel()
 
 	s, ce := concurrency.NewSession(c, concurrency.WithContext(ctx))
@@ -71,7 +71,7 @@ func NewInteractor() (Interactor, error) {
 	}
 
 	// new seesion, new mutex
-	ctx, cancel := context.WithTimeout(context.Background(), timeoutSecond*time.Second)
+	ctx, cancel := context.WithTimeout(context.TODO(), timeoutSecond*time.Second)
 	defer cancel()
 
 	s, ce := concurrency.NewSession(c, concurrency.WithContext(ctx))
@@ -95,7 +95,7 @@ func (i *interactor) Close() {
 }
 
 func (i *interactor) Lock() (context.CancelFunc, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), timeoutSecond*time.Second)
+	ctx, cancel := context.WithTimeout(context.TODO(), timeoutSecond*time.Second)
 
 	err := i.m.Lock(ctx)
 	if err != nil {
@@ -106,7 +106,7 @@ func (i *interactor) Lock() (context.CancelFunc, error) {
 }
 
 func (i *interactor) Unlock() (context.CancelFunc, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), timeoutSecond*time.Second)
+	ctx, cancel := context.WithTimeout(context.TODO(), timeoutSecond*time.Second)
 
 	err := i.m.Unlock(ctx)
 	if err != nil {
@@ -117,7 +117,7 @@ func (i *interactor) Unlock() (context.CancelFunc, error) {
 }
 
 func (i *interactor) Get(key string) (string, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), timeoutSecond*time.Second)
+	ctx, cancel := context.WithTimeout(context.TODO(), timeoutSecond*time.Second)
 	defer cancel()
 
 	rsp, ge := i.c.Get(ctx, key)
@@ -133,7 +133,7 @@ func (i *interactor) Get(key string) (string, error) {
 }
 
 func (i *interactor) Put(key string, value string) error {
-	ctx, cancel := context.WithTimeout(context.Background(), timeoutSecond*time.Second)
+	ctx, cancel := context.WithTimeout(context.TODO(), timeoutSecond*time.Second)
 	defer cancel()
 
 	_, err := i.c.Put(ctx, key, value)
@@ -145,7 +145,7 @@ func (i *interactor) Put(key string, value string) error {
 }
 
 func (i *interactor) Del(key string) error {
-	ctx, cancel := context.WithTimeout(context.Background(), timeoutSecond*time.Second)
+	ctx, cancel := context.WithTimeout(context.TODO(), timeoutSecond*time.Second)
 	defer cancel()
 
 	_, err := i.c.Delete(ctx, key)

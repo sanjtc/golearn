@@ -34,6 +34,7 @@ func TestNewInteractorWithEmbed(t *testing.T) {
 	testPut(t, interactor)
 	testGet(t, interactor)
 	testDel(t, interactor)
+	testLock(t, interactor)
 }
 
 func testPut(t *testing.T, interactor Interactor) {
@@ -90,49 +91,21 @@ func testDel(t *testing.T, interactor Interactor) {
 	}
 }
 
-// func TestEtcdMutex(t *testing.T) {
-// 	i, err := NewInteractorWithEmbed()
+func testLock(t *testing.T, interactor Interactor) {
+	if _, err := interactor.Lock(); err != nil {
+		t.Log(err)
+	}
 
-// 	if err != nil {
-// 		t.Log(err)
-// 		return
-// 	}
+	if _, err := interactor.Unlock(); err != nil {
+		t.Log(err)
+	}
+}
 
-// 	defer i.Close()
-
-// 	_, err = i.Lock()
-// 	if err != nil {
-// 		t.Log(err)
-// 		return
-// 	}
-
-// 	t.Log("locked out")
-
-// 	go func() {
-// 		_, err := i.Lock()
-// 		if err != nil {
-// 			t.Log(err)
-// 			return
-// 		}
-
-// 		t.Log("locked in")
-
-// 		// time.Sleep(5 * time.Second)
-
-// 		_, err = i.Unlock()
-// 		if err != nil {
-// 			t.Log(err)
-// 			return
-// 		}
-
-// 		t.Log("unlocked in")
-// 	}()
-
-// 	_, err = i.Unlock()
-// 	if err != nil {
-// 		t.Log(err)
-// 		return
-// 	}
-
-// 	t.Log("unlocked out")
-// }
+func TestNewInteractor(t *testing.T) {
+	interactor, err := NewInteractor()
+	if err != nil {
+		t.Log(err)
+	} else {
+		interactor.Close()
+	}
+}

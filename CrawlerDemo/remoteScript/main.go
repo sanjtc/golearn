@@ -117,8 +117,8 @@ func RunSrc() error {
 	}
 
 	cmds := []string{
-		"cd /home/wx/CrawlerDemo/local",
-		"go run start.go -n 4",
+		"cd /home/wx/CrawlerDemo/localScript",
+		"go run main.go -n 4",
 	}
 
 	out, err := sshInteractor.Run(cmds)
