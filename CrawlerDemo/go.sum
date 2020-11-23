@@ -298,10 +298,16 @@ github.com/pantskun/commonutils v0.0.0-20201122121600-428b82c66127 h1:Grata0kmBU
 github.com/pantskun/commonutils v0.0.0-20201122121600-428b82c66127/go.mod h1:SV4Xo1uoQUXKf1BCIm60zcvuYW+3KWIRcvehLxGpZB8=
 github.com/pantskun/commonutils v0.0.0-20201122135920-8e42b285e1a2 h1:k7n2hKJZOdri2juCBb0JSYSB+uSB/T9flxHps84rGN8=
 github.com/pantskun/commonutils v0.0.0-20201122135920-8e42b285e1a2/go.mod h1:SV4Xo1uoQUXKf1BCIm60zcvuYW+3KWIRcvehLxGpZB8=
+github.com/pantskun/commonutils v0.0.0-20201123061304-5a3f018672f4 h1:cu35aasIAVupktWFwdZogpRC1zfQOVsS4gocMqhVIHs=
+github.com/pantskun/commonutils v0.0.0-20201123061304-5a3f018672f4/go.mod h1:ak8ca/a4qo6F/oTdP+I/wps2/N4L8ZbFTtmA0zcukxk=
 github.com/pantskun/pathlib v0.0.0-20201021031143-aa61c89a3181 h1:MqVkkrDlu4vN4ApwNuzEcaXCLudB488aGr9wqbus8Gs=
 github.com/pantskun/pathlib v0.0.0-20201021031143-aa61c89a3181/go.mod h1:av+JlQmqnPqIqZR4F0iuBOq2D9YhBHKkBPtmh+w+s4o=
 github.com/pantskun/remotelib v0.0.0-20201022142915-b4cf92002658 h1:rOtZuBDEuJP0JUQogUMGi27i3td8QQqopha+/F4XvFE=
 github.com/pantskun/remotelib v0.0.0-20201022142915-b4cf92002658/go.mod h1:9AGBhVcsbJ1Ji3cPKFQGbnzkVhdMlxmuPwb83btDiXI=
+github.com/pantskun/remotelib v0.0.0-20201123072637-431bc3271fa0 h1:0kPIIgt/YohnoCHSjiuF5GtoVIhWY9Xt+8Qc+xpDUpQ=
+github.com/pantskun/remotelib v0.0.0-20201123072637-431bc3271fa0/go.mod h1:9AGBhVcsbJ1Ji3cPKFQGbnzkVhdMlxmuPwb83btDiXI=
+github.com/pantskun/remotelib v0.0.0-20201123075235-a8591a2e0a18 h1:wyw1iilENCgOdwtepufTZDMbZ64HlCulzpt+anX7p7Y=
+github.com/pantskun/remotelib v0.0.0-20201123075235-a8591a2e0a18/go.mod h1:9AGBhVcsbJ1Ji3cPKFQGbnzkVhdMlxmuPwb83btDiXI=
 github.com/patrickmn/go-cache v2.1.0+incompatible/go.mod h1:3Qf8kWWT7OJRJbdiICTKqZju1ZixQ/KpMGzzAfe6+WQ=
 github.com/pierrec/lz4 v2.0.5+incompatible/go.mod h1:pdkljMzZIN41W+lC3N2tnIh5sFi+IEE17M5jbnwPHcY=
 github.com/pkg/errors v0.8.0/go.mod h1:bwawxfHBFNV+L2hUp1rHADufV3IMtnDRdf1r5NINEl0=

@@ -13,10 +13,10 @@ import (
 )
 
 func main() {
-	procnum := flag.Int("n", 1, "process number")
-	flag.Parse()
+	var procNum int
 
-	n := *procnum
+	flag.IntVar(&procNum, "n", 1, "process number")
+	flag.Parse()
 
 	// 启动etcd
 	startEtcdCmd := osutils.NewCommand("etcd")
@@ -48,19 +48,19 @@ func main() {
 	mainPath := path.Join(pathutils.GetModulePath("CrawlerDemo"), "main", "main.go")
 	log.Println("work directory: ", mainPath)
 
-	cmds := make([]osutils.Command, n)
+	cmds := make([]osutils.Command, procNum)
 
-	for i := 0; i < n; i++ {
+	for i := 0; i < procNum; i++ {
 		cmds[i] = osutils.NewCommand("go", "run", mainPath)
 		cmds[i].RunAsyn()
 		log.Println("start process ", i+1)
 	}
 
-	// 等待多个进程执行完成
+	// 是否需要对多个进程执行结果进行检查
 	var needCheck bool = true
 
+	// 等待多个进程执行完成
 	waitChan := make(chan int)
-	interruptChan := make(chan int)
 
 	waitProc := func() {
 		for _, cmd := range cmds {
@@ -77,6 +77,8 @@ func main() {
 	go waitProc()
 
 	// 处理远程中断
+	interruptChan := make(chan int)
+
 	go func() {
 		err := listenRemoteInterrupt(":2233", interruptChan)
 		if err != nil {
@@ -89,9 +91,9 @@ func main() {
 		{
 			// 检查执行结果
 			if needCheck && checkCmds(cmds) {
-				fmt.Println("successed")
+				log.Println("successed")
 			} else {
-				fmt.Println("failed")
+				log.Println("failed")
 			}
 		}
 	case <-interruptChan:

@@ -23,6 +23,8 @@ func main() {
 	taskPool := taskutils.NewTaskPool()
 	taskPool.Run()
 
+	defer taskPool.Close()
+
 	uploadTask := taskutils.NewTask(
 		"uploadTask",
 		func() error {
@@ -76,8 +78,6 @@ func main() {
 			}
 		}
 	}
-
-	taskPool.Close()
 }
 
 func UploadSrc() error {
@@ -121,12 +121,11 @@ func RunSrc() error {
 		"go run main.go -n 4",
 	}
 
-	out, err := sshInteractor.Run(cmds)
-	if err != nil {
+	if err := sshInteractor.Run(cmds); err != nil {
 		return err
 	}
 
-	log.Println(out)
+	log.Println("stderr: \n", sshInteractor.GetStderr())
 
 	return nil
 }

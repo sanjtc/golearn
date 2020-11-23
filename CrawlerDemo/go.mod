@@ -16,8 +16,8 @@ require (
 	github.com/grpc-ecosystem/go-grpc-prometheus v1.2.0 // indirect
 	github.com/grpc-ecosystem/grpc-gateway v1.15.2 // indirect
 	github.com/jonboulle/clockwork v0.2.2 // indirect
-	github.com/pantskun/commonutils v0.0.0-20201122135920-8e42b285e1a2
-	github.com/pantskun/remotelib v0.0.0-20201022142915-b4cf92002658
+	github.com/pantskun/commonutils v0.0.0-20201123061304-5a3f018672f4
+	github.com/pantskun/remotelib v0.0.0-20201123075235-a8591a2e0a18
 	github.com/prometheus/client_golang v1.7.1 // indirect
 	github.com/soheilhy/cmux v0.1.4 // indirect
 	github.com/stretchr/testify v1.6.1
