@@ -82,5 +82,4 @@ func TestWaitingResult(t *testing.T) {
 		got := waitingResult(testCase.waitChen, testCase.interruptChan, testCase.cmds)
 		assert.Equal(t, testCase.expected, got)
 	}
-
 }
