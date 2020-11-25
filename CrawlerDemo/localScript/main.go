@@ -6,11 +6,14 @@ import (
 	"log"
 	"net"
 	"path"
+	"runtime"
 	"strings"
 
 	"github.com/pantskun/commonutils/osutils"
 	"github.com/pantskun/commonutils/pathutils"
 )
+
+const interruptMsg = "interrupt"
 
 func main() {
 	var procNum int
@@ -18,88 +21,55 @@ func main() {
 	flag.IntVar(&procNum, "n", 1, "process number")
 	flag.Parse()
 
+	if procNum > runtime.NumCPU() {
+		procNum = runtime.NumCPU()
+		log.Println("Number of CPU core is ", runtime.NumCPU())
+	}
+
 	// 启动etcd
 	startEtcdCmd := osutils.NewCommand("etcd")
-
-	go func() {
-		startEtcdCmd.Run()
-
-		if startEtcdCmd.GetCmdState() == osutils.ECmdStateError {
-			log.Println(startEtcdCmd.GetCmdError())
-			return
-		}
-
-		log.Println(startEtcdCmd.GetStdout())
-	}()
+	startEtcdCmd.RunAsyn()
 
 	defer func() {
 		// 清除etcd数据，关闭etcd
 		delEtcdDataCmd := osutils.NewCommand("etcdctl", "del", "--prefix", "https://")
 		delEtcdDataCmd.Run()
 
-		if delEtcdDataCmd.GetCmdState() == osutils.ECmdStateError {
-			log.Println(delEtcdDataCmd.GetCmdError())
-		}
-
 		_ = startEtcdCmd.Kill()
 	}()
 
-	// start n processes
-	mainPath := path.Join(pathutils.GetModulePath("CrawlerDemo"), "main", "main.go")
-	log.Println("work directory: ", mainPath)
-
-	cmds := make([]osutils.Command, procNum)
-
-	for i := 0; i < procNum; i++ {
-		cmds[i] = osutils.NewCommand("go", "run", mainPath)
-		cmds[i].RunAsyn()
-		log.Println("start process ", i+1)
-	}
-
-	// 是否需要对多个进程执行结果进行检查
-	var needCheck bool = true
-
-	// 等待多个进程执行完成
 	waitChan := make(chan int)
-
-	waitProc := func() {
-		for _, cmd := range cmds {
-			for cmd.GetCmdState() == osutils.ECmdStateRunning {
-			}
-
-			// 如果有cmd执行失败，则不进行check
-			if cmd.GetCmdState() == osutils.ECmdStateError {
-				needCheck = false
-			}
-		}
-		waitChan <- 0
-	}
-	go waitProc()
-
-	// 处理远程中断
 	interruptChan := make(chan int)
 
+	// start n processes
+	mainPath := path.Join(pathutils.GetModulePath("CrawlerDemo"), "main", "main.go")
+	multiProcCmd := osutils.NewMultiProcCmd(procNum, "go", "run", mainPath)
+
 	go func() {
-		err := listenRemoteInterrupt(":2233", interruptChan)
-		if err != nil {
-			log.Println(err)
-		}
+		multiProcCmd.Run()
+		waitChan <- 0
 	}()
 
+	// 处理远程中断
+	processRemoteInterrupt(":2233", interruptChan)
+
+	// 等待结果
+	log.Println(waitingResult(waitChan, interruptChan, multiProcCmd.GetCmds()))
+}
+
+func waitingResult(waitChan, interruptChan chan int, cmds []osutils.Command) string {
 	select {
 	case <-waitChan:
 		{
 			// 检查执行结果
-			if needCheck && checkCmds(cmds) {
-				log.Println("successed")
+			if checkCmdOuts(cmds) {
+				return "successed"
 			} else {
-				log.Println("failed")
+				return "failed"
 			}
 		}
 	case <-interruptChan:
 		{
-			log.Println("receive interrupt")
-
 			for _, cmd := range cmds {
 				if cmd == nil {
 					continue
@@ -108,16 +78,22 @@ func main() {
 					log.Println(err)
 				}
 			}
+			return interruptMsg
 		}
 	}
 }
 
-func checkCmds(cmds []osutils.Command) bool {
+func checkCmdOuts(cmds []osutils.Command) bool {
 	n := len(cmds)
 	outs := make([][]string, n)
 
-	for i := 0; i < n; i++ {
-		outs[i] = strings.Split(cmds[i].GetStdout(), "\n")
+	for i, cmd := range cmds {
+		// 有命令执行失败，返回false
+		if cmd.GetCmdState() == osutils.ECmdStateError {
+			return false
+		}
+
+		outs[i] = strings.Split(cmd.GetStdout(), "\n")
 		outs[i] = outs[i][0 : len(outs[i])-1]
 	}
 
@@ -138,6 +114,15 @@ func checkCmds(cmds []osutils.Command) bool {
 	}
 
 	return true
+}
+
+func processRemoteInterrupt(listenAddr string, interruptChan chan int) {
+	go func() {
+		err := listenRemoteInterrupt(listenAddr, interruptChan)
+		if err != nil {
+			log.Println(err)
+		}
+	}()
 }
 
 func listenRemoteInterrupt(addr string, interruptChan chan int) error {
@@ -164,7 +149,7 @@ func listenRemoteInterrupt(addr string, interruptChan chan int) error {
 
 		log.Println("receive:", msg)
 
-		if msg == "interrupt" {
+		if msg == interruptMsg {
 			// 处理中断
 			interruptChan <- 0
 			return nil

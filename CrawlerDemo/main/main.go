@@ -12,6 +12,7 @@ import (
 )
 
 func main() {
+	// 获取url
 	url := "https://www.ssetech.com.cn/"
 	nodes := crawler.GetElementNodesFromURL(url, "a")
 
@@ -38,6 +39,7 @@ func main() {
 
 	urls = crawler.FilterURL(urls, urlPrefixFilter, urlHTMLFilter)
 
+	// 下载url
 	// interactor := etcd.NewInteractorWithEmbed()
 	etcdInteractor, err := etcd.NewInteractor()
 	if err != nil {

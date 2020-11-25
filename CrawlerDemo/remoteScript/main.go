@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"flag"
 	"log"
 	"net"
 	"os"
@@ -14,7 +15,23 @@ import (
 )
 
 func main() {
-	ctx, cancel := context.WithCancel(context.Background())
+	var (
+		remoteIP   string
+		remotePort string
+		remoteUser string
+		remotePwd  string
+		uploadPath string
+	)
+
+	flag.StringVar(&remoteIP, "addr", "192.168.62.11", "remote address")
+	flag.StringVar(&remotePort, "port", "22", "remote port")
+	flag.StringVar(&remoteUser, "user", "wx", "remote user")
+	flag.StringVar(&remotePwd, "pwd", "1235", "remote password")
+	flag.StringVar(&uploadPath, "path", "/home/wx", "upload path")
+
+	flag.Parse()
+
+	ctx, cancel := context.WithCancel(context.TODO())
 	defer cancel()
 
 	signalChan := make(chan os.Signal)
@@ -30,7 +47,7 @@ func main() {
 		func() error {
 			log.Println("uploadTask start")
 
-			if err := UploadSrc(); err != nil {
+			if err := UploadSrc(remoteIP, remotePort, remoteUser, remotePwd, uploadPath); err != nil {
 				return err
 			}
 
@@ -45,7 +62,7 @@ func main() {
 		func() error {
 			log.Println("runTask start")
 
-			if err := RunSrc(); err != nil {
+			if err := RunSrc(remoteIP, remotePort, remoteUser, remotePwd); err != nil {
 				return err
 			}
 
@@ -66,7 +83,7 @@ func main() {
 		select {
 		case <-ctx.Done():
 			{
-				if err := ProcessInterrupt(); err != nil {
+				if err := ProcessInterrupt(remoteIP, "2233"); err != nil {
 					log.Println(err)
 				}
 
@@ -80,13 +97,13 @@ func main() {
 	}
 }
 
-func UploadSrc() error {
+func UploadSrc(ip, port, user, pwd, uploadPath string) error {
 	sftpConfig := remotesftp.SFTPConfig{
 		Network:  "tcp",
-		IP:       "192.168.62.11",
-		Port:     "22",
-		User:     "wx",
-		Password: "1235",
+		IP:       ip,
+		Port:     port,
+		User:     user,
+		Password: pwd,
 	}
 
 	sftpInteractor, err := remotesftp.NewInteractor(sftpConfig)
@@ -94,7 +111,7 @@ func UploadSrc() error {
 		return err
 	}
 
-	err = sftpInteractor.Upload(pathutils.GetModulePath("CrawlerDemo"), "/home/wx")
+	err = sftpInteractor.Upload(pathutils.GetModulePath("CrawlerDemo"), uploadPath)
 	if err != nil {
 		return err
 	}
@@ -102,13 +119,13 @@ func UploadSrc() error {
 	return nil
 }
 
-func RunSrc() error {
+func RunSrc(ip, port, user, pwd string) error {
 	sshConfig := remotessh.SSHConfig{
 		Network:  "tcp",
-		IP:       "192.168.62.11",
-		Port:     "22",
-		User:     "wx",
-		Password: "1235",
+		IP:       ip,
+		Port:     port,
+		User:     user,
+		Password: pwd,
 	}
 
 	sshInteractor, err := remotessh.NewInteractor(sshConfig)
@@ -130,8 +147,8 @@ func RunSrc() error {
 	return nil
 }
 
-func ProcessInterrupt() error {
-	conn, err := net.Dial("tcp", "192.168.62.11:2233")
+func ProcessInterrupt(ip, port string) error {
+	conn, err := net.Dial("tcp", ip+":"+port)
 	if err != nil {
 		return err
 	}
