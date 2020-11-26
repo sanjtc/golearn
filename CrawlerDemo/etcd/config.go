@@ -10,6 +10,8 @@ import (
 	"github.com/coreos/etcd/clientv3"
 )
 
+// GetClientConfig
+// 获取etcd配置文件
 func GetClientConfig(filePath string) clientv3.Config {
 	const timeSecond = 5.0
 

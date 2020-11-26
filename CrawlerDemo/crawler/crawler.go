@@ -13,6 +13,8 @@ import (
 	"golang.org/x/net/html"
 )
 
+// GetElementNodesFromURL
+// 从url页面获取element类型的标签
 func GetElementNodesFromURL(url string, element string) []*html.Node {
 	resp, err := http.Get(fmt.Sprint(url))
 	if err != nil {
@@ -34,7 +36,8 @@ func GetElementNodesFromURL(url string, element string) []*html.Node {
 	return doc.Find("a").Nodes
 }
 
-// GetElementAttributeValue get attribute value from html.Node.
+// GetElementAttributeValue
+// 从element中获取attribute属性值
 func GetElementAttributeValue(element *html.Node, attribute string) string {
 	if element == nil {
 		return ""
@@ -51,7 +54,8 @@ func GetElementAttributeValue(element *html.Node, attribute string) string {
 
 type URLFilter func(string) bool
 
-// FilterURL filter url by URLFilters.
+// FilterURL
+// 根据filters对urls进行过滤
 func FilterURL(urls []string, filters ...URLFilter) []string {
 	result := []string{}
 
@@ -73,6 +77,8 @@ func FilterURL(urls []string, filters ...URLFilter) []string {
 	return result
 }
 
+// DownloadURL
+// 下载url至p位置
 func DownloadURL(url string, p string) error {
 	rsp, err := http.Get(fmt.Sprint(url))
 	if err != nil {
@@ -87,7 +93,5 @@ func DownloadURL(url string, p string) error {
 		return err
 	}
 
-	file := HTMLFile{Path: filePath, Content: body}
-
-	return file.Write()
+	return WriteToFile(filePath, body)
 }

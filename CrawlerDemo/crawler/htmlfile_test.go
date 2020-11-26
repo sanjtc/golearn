@@ -19,12 +19,7 @@ func TestWrite(t *testing.T) {
 		assert.Nil(t, err)
 	}()
 
-	htmlFile := HTMLFile{
-		Path:    filePath,
-		Content: []byte("hello"),
-	}
-
-	err := htmlFile.Write()
+	err := WriteToFile(filePath, []byte("hello"))
 	assert.Nil(t, err)
 
 	file, err := os.Open(filePath)
@@ -35,5 +30,5 @@ func TestWrite(t *testing.T) {
 	file.Close()
 	assert.Nil(t, err)
 
-	assert.Equal(t, buf.String(), string(htmlFile.Content))
+	assert.Equal(t, buf.String(), "hello")
 }

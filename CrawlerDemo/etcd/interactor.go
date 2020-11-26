@@ -39,6 +39,8 @@ func (err *InteractorError) Error() string {
 	return err.msg
 }
 
+// NewInteractorWithEmbed
+// 获取与嵌入etcd交互的Interactor
 func NewInteractorWithEmbed() (Interactor, error) {
 	e, err := newEmbedetcd()
 	if e == nil {
@@ -61,6 +63,8 @@ func NewInteractorWithEmbed() (Interactor, error) {
 	return &interactor{e, c, s, m}, nil
 }
 
+// NewInteractor
+// 获取与etcd交互的Interactor
 func NewInteractor() (Interactor, error) {
 	configPath := pathutils.GetModulePath("CrawlerDemo") + "/configs/etcdConfig.json"
 	config := GetClientConfig(configPath)

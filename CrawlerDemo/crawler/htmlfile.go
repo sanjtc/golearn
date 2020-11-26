@@ -11,13 +11,15 @@ type HTMLFile struct {
 	Content []byte
 }
 
-func (f *HTMLFile) Write() error {
-	file, err := CreateFile(f.Path)
+// WriteToFile
+// 将content写入filePath文件中
+func WriteToFile(filePath string, content []byte) error {
+	file, err := CreateFile(filePath)
 	if err != nil {
 		return err
 	}
 
-	_, err = file.Write(f.Content)
+	_, err = file.Write(content)
 	if err != nil {
 		return err
 	}
@@ -27,6 +29,8 @@ func (f *HTMLFile) Write() error {
 	return nil
 }
 
+// CreateFile
+// 创建fp文件
 func CreateFile(fp string) (*os.File, error) {
 	p := pathutils.GetParentPath(fp)
 
