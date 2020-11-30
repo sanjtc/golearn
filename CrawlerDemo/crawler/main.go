@@ -1,25 +1,30 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"log"
 	"path"
 	"strings"
 
 	"github.com/pantskun/commonutils/pathutils"
-	"github.com/pantskun/golearn/CrawlerDemo/crawler"
 	"github.com/pantskun/golearn/CrawlerDemo/etcd"
+	"github.com/pantskun/golearn/CrawlerDemo/htmlutil"
 )
 
 func main() {
+	var url string
+
+	flag.StringVar(&url, "url", "https://www.ssetech.com.cn/", "url")
+	flag.Parse()
+
 	// 获取url
-	url := "https://www.ssetech.com.cn/"
-	nodes := crawler.GetElementNodesFromURL(url, "a")
+	nodes := htmlutil.GetElementNodesFromURL(url, "a")
 
 	urls := []string{}
 
 	for _, n := range nodes {
-		url := crawler.GetElementAttributeValue(n, "href")
+		url := htmlutil.GetElementAttributeValue(n, "href")
 		log.Println("Name: ", n.Data, " herf: ", url)
 		urls = append(urls, url)
 	}
@@ -37,7 +42,7 @@ func main() {
 		return ext == ".html"
 	}
 
-	urls = crawler.FilterURL(urls, urlPrefixFilter, urlHTMLFilter)
+	urls = htmlutil.FilterURL(urls, urlPrefixFilter, urlHTMLFilter)
 
 	// 下载url
 	// interactor := etcd.NewInteractorWithEmbed()
@@ -81,7 +86,7 @@ func main() {
 
 		// download
 		if needDownload {
-			err = crawler.DownloadURL(url, path.Join(pathutils.GetModulePath("CrawlerDemo"), "download"))
+			err = htmlutil.DownloadURL(url, path.Join(pathutils.GetModulePath("CrawlerDemo"), "download"))
 			if err != nil {
 				log.Println(err)
 				continue

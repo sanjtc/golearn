@@ -9,7 +9,7 @@
             "type": "go",
             "request": "launch",
             "mode": "auto",
-            "program": "${fileDirname}",
+            "program": "${workspaceFolder}/local/main.go",
             "env": {},
             "args": [
                 "-n",
@@ -21,9 +21,12 @@
             "type": "go",
             "request": "launch",
             "mode": "auto",
-            "program": "${fileDirname}",
+            "program": "${workspaceFolder}/remote/main.go",
             "env": {},
-            "args": []
+            "args": [
+                "-n",
+                "4"
+            ]
         }
     ]
 }

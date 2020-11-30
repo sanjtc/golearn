@@ -16,9 +16,13 @@ import (
 const interruptMsg = "interrupt"
 
 func main() {
-	var procNum int
+	var (
+		procNum int
+		url     string
+	)
 
 	flag.IntVar(&procNum, "n", 1, "process number")
+	flag.StringVar(&url, "url", "https://www.ssetech.com.cn/", "url")
 	flag.Parse()
 
 	if procNum > runtime.NumCPU() {
@@ -42,8 +46,13 @@ func main() {
 	interruptChan := make(chan int)
 
 	// start n processes
-	mainPath := path.Join(pathutils.GetModulePath("CrawlerDemo"), "main", "main.go")
-	multiProcCmd := osutils.NewMultiProcCmd(procNum, "go", "run", mainPath)
+	mainPath := path.Join(pathutils.GetModulePath("CrawlerDemo"), "crawler", "main.go")
+	multiProcCmd := osutils.NewMultiProcCmd(procNum, "go", "run", mainPath, "-url", url)
+
+	if startEtcdCmd.GetCmdState() == osutils.ECmdStateError {
+		log.Println(startEtcdCmd.GetCmdError())
+		return
+	}
 
 	go func() {
 		multiProcCmd.Run()
