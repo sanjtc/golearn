@@ -1,6 +1,7 @@
 package htmlutil
 
 import (
+	"net/http"
 	"os"
 	"path"
 	"strings"
@@ -66,7 +67,7 @@ func TestFilterURL(t *testing.T) {
 		return strings.HasPrefix(s, "http")
 	}
 
-	urls = FilterURL(urls, filter1)
+	urls = FilterURLs(urls, filter1)
 
 	for _, url := range urls {
 		assert.Equal(t, strings.HasPrefix(url, "http"), true)
@@ -83,4 +84,18 @@ func TestDownloadURL(t *testing.T) {
 
 	err := DownloadURL(url, downloadPath)
 	assert.Nil(t, err)
+}
+
+func TestHead(t *testing.T) {
+	client := &http.Client{
+		CheckRedirect: func(req *http.Request, via []*http.Request) error {
+			return http.ErrUseLastResponse
+		},
+	}
+
+	resp, _ := client.Get("https://www.ssetech.com.cn/statics/")
+
+	location := resp.Header.Get("Location")
+
+	t.Log(location)
 }

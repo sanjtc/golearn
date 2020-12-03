@@ -16,14 +16,14 @@ require (
 	github.com/grpc-ecosystem/go-grpc-prometheus v1.2.0 // indirect
 	github.com/grpc-ecosystem/grpc-gateway v1.15.2 // indirect
 	github.com/jonboulle/clockwork v0.2.2 // indirect
-	github.com/pantskun/commonutils v0.0.0-20201127082526-0271fca67db1
-	github.com/pantskun/remotelib v0.0.0-20201127085010-dcda370cec9f
+	github.com/pantskun/commonutils v0.1.0
+	github.com/pantskun/remotelib v0.1.0
 	github.com/prometheus/client_golang v1.7.1 // indirect
 	github.com/soheilhy/cmux v0.1.4 // indirect
 	github.com/stretchr/testify v1.6.1
 	github.com/tmc/grpc-websocket-proxy v0.0.0-20200427203606-3cfed13b9966 // indirect
 	github.com/xiang90/probing v0.0.0-20190116061207-43a291ad63a2 // indirect
-	golang.org/x/net v0.0.0-20200707034311-ab3426394381
+	golang.org/x/net v0.0.0-20200813134508-3edf25e44fcc
 	golang.org/x/time v0.0.0-20200630173020-3af7569d3a1e // indirect
 	google.golang.org/genproto v0.0.0-20201009135657-4d944d34d83c // indirect
 	google.golang.org/grpc v1.33.0 // indirect
@@ -31,3 +31,6 @@ require (
 )
 
 replace google.golang.org/grpc => google.golang.org/grpc v1.26.0
+
+// replace github.com/pantskun/commonutils => C:/Users/wangx/go/src/github.com/pantskun/commonutils
+// replace github.com/pantskun/remotelib => C:/Users/wangx/go/src/github.com/pantskun/remotelib

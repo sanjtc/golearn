@@ -14,12 +14,12 @@ import (
 const timeoutSecond = 5.0
 
 type Interactor interface {
+	Close()
 	Get(key string) (string, error)
 	Put(key string, value string) error
 	Del(key string) error
 	Lock() (context.CancelFunc, error)
 	Unlock() (context.CancelFunc, error)
-	Close()
 }
 
 type interactor struct {
@@ -98,28 +98,6 @@ func (i *interactor) Close() {
 	i.s.Close()
 }
 
-func (i *interactor) Lock() (context.CancelFunc, error) {
-	ctx, cancel := context.WithTimeout(context.TODO(), timeoutSecond*time.Second)
-
-	err := i.m.Lock(ctx)
-	if err != nil {
-		return cancel, err
-	}
-
-	return cancel, nil
-}
-
-func (i *interactor) Unlock() (context.CancelFunc, error) {
-	ctx, cancel := context.WithTimeout(context.TODO(), timeoutSecond*time.Second)
-
-	err := i.m.Unlock(ctx)
-	if err != nil {
-		return cancel, err
-	}
-
-	return cancel, nil
-}
-
 func (i *interactor) Get(key string) (string, error) {
 	ctx, cancel := context.WithTimeout(context.TODO(), timeoutSecond*time.Second)
 	defer cancel()
@@ -158,4 +136,26 @@ func (i *interactor) Del(key string) error {
 	}
 
 	return nil
+}
+
+func (i *interactor) Lock() (context.CancelFunc, error) {
+	ctx, cancel := context.WithTimeout(context.TODO(), timeoutSecond*time.Second)
+
+	err := i.m.Lock(ctx)
+	if err != nil {
+		return cancel, err
+	}
+
+	return cancel, nil
+}
+
+func (i *interactor) Unlock() (context.CancelFunc, error) {
+	ctx, cancel := context.WithTimeout(context.TODO(), timeoutSecond*time.Second)
+
+	err := i.m.Unlock(ctx)
+	if err != nil {
+		return cancel, err
+	}
+
+	return cancel, nil
 }

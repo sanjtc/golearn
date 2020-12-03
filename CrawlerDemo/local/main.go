@@ -6,7 +6,6 @@ import (
 	"log"
 	"net"
 	"path"
-	"runtime"
 	"strings"
 
 	"github.com/pantskun/commonutils/osutils"
@@ -25,10 +24,10 @@ func main() {
 	flag.StringVar(&url, "url", "https://www.ssetech.com.cn/", "url")
 	flag.Parse()
 
-	if procNum > runtime.NumCPU() {
-		procNum = runtime.NumCPU()
-		log.Println("Number of CPU core is ", runtime.NumCPU())
-	}
+	// if procNum > runtime.NumCPU() {
+	// 	procNum = runtime.NumCPU()
+	// 	log.Println("Number of CPU core is ", runtime.NumCPU())
+	// }
 
 	// 启动etcd
 	startEtcdCmd := osutils.NewCommand("etcd")
@@ -36,7 +35,7 @@ func main() {
 
 	defer func() {
 		// 清除etcd数据，关闭etcd
-		delEtcdDataCmd := osutils.NewCommand("etcdctl", "del", "--prefix", "https://")
+		delEtcdDataCmd := osutils.NewCommand("etcdctl", "del", "--prefix", "/crawler")
 		delEtcdDataCmd.Run()
 
 		_ = startEtcdCmd.Kill()

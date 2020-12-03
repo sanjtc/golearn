@@ -26,6 +26,7 @@ func GetElementNodesFromURL(url string, element string) []*html.Node {
 
 	if err != nil {
 		log.Println(err)
+		return nil
 	}
 
 	doc, err := goquery.NewDocumentFromReader(bytes.NewBuffer(body))
@@ -54,9 +55,19 @@ func GetElementAttributeValue(element *html.Node, attribute string) string {
 
 type URLFilter func(string) bool
 
-// FilterURL
+func FilterURL(url string, filters ...URLFilter) bool {
+	for _, filter := range filters {
+		if !filter(url) {
+			return false
+		}
+	}
+
+	return true
+}
+
+// FilterURLs
 // 根据filters对urls进行过滤
-func FilterURL(urls []string, filters ...URLFilter) []string {
+func FilterURLs(urls []string, filters ...URLFilter) []string {
 	result := []string{}
 
 	for _, url := range urls {

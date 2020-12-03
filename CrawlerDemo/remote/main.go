@@ -103,8 +103,6 @@ func main() {
 				if err := ProcessInterrupt(remoteIP, "2233"); err != nil {
 					log.Println(err)
 				}
-
-				break
 			}
 		default:
 			{
