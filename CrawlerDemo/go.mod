@@ -3,7 +3,6 @@ module github.com/pantskun/golearn/CrawlerDemo
 go 1.14
 
 require (
-	github.com/PuerkitoBio/goquery v1.6.0
 	github.com/coreos/bbolt v1.3.3 // indirect
 	github.com/coreos/etcd v3.3.25+incompatible
 	github.com/coreos/go-semver v0.3.0 // indirect
