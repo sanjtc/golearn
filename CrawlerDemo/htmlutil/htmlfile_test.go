@@ -19,7 +19,7 @@ func TestWrite(t *testing.T) {
 		assert.Nil(t, err)
 	}()
 
-	err := WriteToFile(filePath, []byte("hello"))
+	err := writeToFile(filePath, []byte("hello"))
 	assert.Nil(t, err)
 
 	file, err := os.Open(filePath)

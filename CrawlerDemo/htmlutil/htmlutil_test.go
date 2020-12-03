@@ -4,32 +4,12 @@ import (
 	"net/http"
 	"os"
 	"path"
-	"strings"
 	"testing"
 
 	"github.com/pantskun/commonutils/pathutils"
 	"github.com/stretchr/testify/assert"
 	"golang.org/x/net/html"
 )
-
-func TestGetElementNodesFromURL(t *testing.T) {
-	type TestCase struct {
-		url      string
-		element  string
-		expected string
-	}
-
-	testCases := []TestCase{
-		{url: "https://www.ssetech.com.cn/", element: "a", expected: "a"},
-	}
-
-	for _, testCase := range testCases {
-		nodes := GetElementNodesFromURL(testCase.url, testCase.element)
-		for _, node := range nodes {
-			assert.Equal(t, node.Data, testCase.expected)
-		}
-	}
-}
 
 func TestGetElementAttributeValue(t *testing.T) {
 	type TestCase struct {
@@ -53,24 +33,6 @@ func TestGetElementAttributeValue(t *testing.T) {
 	for _, testCase := range testCases {
 		value := GetElementAttributeValue(testCase.element, testCase.attribute)
 		assert.Equal(t, value, testCase.expected)
-	}
-}
-
-func TestFilterURL(t *testing.T) {
-	urls := []string{
-		":",
-		"http://test1",
-		"https://test2",
-	}
-
-	filter1 := func(s string) bool {
-		return strings.HasPrefix(s, "http")
-	}
-
-	urls = FilterURLs(urls, filter1)
-
-	for _, url := range urls {
-		assert.Equal(t, strings.HasPrefix(url, "http"), true)
 	}
 }
 

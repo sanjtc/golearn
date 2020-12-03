@@ -11,10 +11,10 @@ type HTMLFile struct {
 	Content []byte
 }
 
-// WriteToFile
+// writeToFile
 // 将content写入filePath文件中
-func WriteToFile(filePath string, content []byte) error {
-	file, err := CreateFile(filePath)
+func writeToFile(filePath string, content []byte) error {
+	file, err := createFile(filePath)
 	if err != nil {
 		return err
 	}
@@ -29,9 +29,9 @@ func WriteToFile(filePath string, content []byte) error {
 	return nil
 }
 
-// CreateFile
+// createFile
 // 创建fp文件
-func CreateFile(fp string) (*os.File, error) {
+func createFile(fp string) (*os.File, error) {
 	p := pathutils.GetParentPath(fp)
 
 	err := os.MkdirAll(p, os.ModePerm)
