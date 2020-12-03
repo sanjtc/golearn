@@ -19,12 +19,12 @@ func HandleHrefMultiprocess(node *html.Node, etcdInteractor etcd.Interactor) {
 
 	log.Println("process key:", key)
 
-	urlHandlers := []URLHandler{
-		NewHandlerWithFilters(handleURLWithAbsolutePathAndHTMLFile, filterURLWithAbsolutePath, filterURLWithHTMLFile),
-		NewHandlerWithFilters(handleURLWithAbsolutePathAndNotFile, filterURLWithAbsolutePath, filterURLWithNotFile),
-		NewHandlerWithFilters(handleURLWithRelativePathAndHTMLFile, filterURLWithRelativePath, filterURLWithHTMLFile),
-		NewHandlerWithFilters(handleURLWithRelativePathAndNotFile, filterURLWithRelativePath, filterURLWithNotFile),
-		NewHandlerWithFilters(handleURLWithJS, filterURLWithJS),
+	urlHandlers := []HrefHandler{
+		NewHandlerWithFilters(handleHrefWithAbsolutePathAndHTMLFile, filterHrefWithAbsolutePath, filterHrefWithHTMLFile),
+		NewHandlerWithFilters(handleHrefWithAbsolutePathAndNotFile, filterHrefWithAbsolutePath, filterHrefWithNotFile),
+		NewHandlerWithFilters(handleHrefWithRelativePathAndHTMLFile, filterHrefWithRelativePath, filterHrefWithHTMLFile),
+		NewHandlerWithFilters(handleHrefWithRelativePathAndNotFile, filterHrefWithRelativePath, filterHrefWithNotFile),
+		NewHandlerWithFilters(handleHrefWithJS, filterHrefWithJS),
 	}
 
 	for _, handler := range urlHandlers {
