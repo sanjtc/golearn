@@ -12,14 +12,14 @@ import (
 type Crawler interface {
 	Visit(url string)
 
-	// AddHTMLNodeHandler
+	// AddHTMLHandler
 	// handle html node with filters, filters will be executed in order of input.
-	AddHTMLNodeHandler(handler HTMLNodeHandler, filters ...HTMLNodeFilter)
+	AddHTMLHandler(handler HTMLHandler, filters ...HTMLNodeFilter)
 }
 
 type crawler struct {
 	rootNode         *html.Node
-	htmlNodeHandlers []HTMLNodeHandler
+	htmlNodeHandlers []HTMLHandler
 }
 
 var _ Crawler = (*crawler)(nil)
@@ -37,7 +37,7 @@ func (c *crawler) Visit(url string) {
 	c.traversingAllNode()
 }
 
-func (c *crawler) AddHTMLNodeHandler(handler HTMLNodeHandler, filters ...HTMLNodeFilter) {
+func (c *crawler) AddHTMLHandler(handler HTMLHandler, filters ...HTMLNodeFilter) {
 	h := func(node *html.Node) {
 		if !FilterHTMLNode(node, filters...) {
 			return

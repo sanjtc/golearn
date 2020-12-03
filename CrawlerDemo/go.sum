@@ -280,6 +280,7 @@ github.com/pantskun/pathlib v0.0.0-20201021031143-aa61c89a3181 h1:MqVkkrDlu4vN4A
 github.com/pantskun/pathlib v0.0.0-20201021031143-aa61c89a3181/go.mod h1:av+JlQmqnPqIqZR4F0iuBOq2D9YhBHKkBPtmh+w+s4o=
 github.com/pantskun/remotelib v0.0.0-20201127085010-dcda370cec9f h1:MRx2BiOfht7vySv2C+yg5Eqbpt/RQle/TmDumnduxsU=
 github.com/pantskun/remotelib v0.0.0-20201127085010-dcda370cec9f/go.mod h1:9AGBhVcsbJ1Ji3cPKFQGbnzkVhdMlxmuPwb83btDiXI=
+github.com/pantskun/remotelib v0.1.0 h1:587rzRWP+jAeHV/M/PbohxSqcj8nRmxWm8sSjj0L7Po=
 github.com/pantskun/remotelib v0.1.0/go.mod h1:9AGBhVcsbJ1Ji3cPKFQGbnzkVhdMlxmuPwb83btDiXI=
 github.com/patrickmn/go-cache v2.1.0+incompatible/go.mod h1:3Qf8kWWT7OJRJbdiICTKqZju1ZixQ/KpMGzzAfe6+WQ=
 github.com/pierrec/lz4 v2.0.5+incompatible/go.mod h1:pdkljMzZIN41W+lC3N2tnIh5sFi+IEE17M5jbnwPHcY=
