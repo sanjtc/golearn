@@ -2,6 +2,7 @@ package htmlutil
 
 import (
 	"net/http"
+	"net/url"
 	"os"
 	"path"
 	"testing"
@@ -42,9 +43,9 @@ func TestDownloadURL(t *testing.T) {
 
 	defer os.RemoveAll(downloadPath)
 
-	url := "https://www.baidu.com/index.html"
+	u, _ := url.Parse("https://www.baidu.com/index.html")
 
-	err := DownloadURL(url, downloadPath)
+	err := DownloadURL(u, downloadPath)
 	assert.Nil(t, err)
 }
 

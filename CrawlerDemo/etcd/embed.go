@@ -16,7 +16,7 @@ type embedetcd struct {
 func newEmbedetcd() (*embedetcd, error) {
 	tdir, err := ioutil.TempDir(os.TempDir(), "embedetcd")
 	if err != nil {
-		log.Println(err)
+		log.Println("error:", err)
 		return nil, err
 	}
 

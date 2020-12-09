@@ -2,36 +2,64 @@ package crawlerutil
 
 import (
 	"log"
+	"net/url"
 	"path"
 
+	"github.com/pantskun/commonutils/pathutils"
 	"github.com/pantskun/golearn/CrawlerDemo/etcd"
 	"github.com/pantskun/golearn/CrawlerDemo/htmlutil"
+	"github.com/pantskun/golearn/CrawlerDemo/xcrawler"
 	"golang.org/x/net/html"
 )
 
-func HandleHrefMultiprocess(node *html.Node, etcdInteractor etcd.Interactor) {
-	url := htmlutil.GetElementAttributeValue(node, "href")
-	key := generateKeyFromURL(url)
+func HandleHref(node *html.Node, c xcrawler.Crawler, etcdInteractor etcd.Interactor) {
+	href := htmlutil.GetElementAttributeValue(node, "href")
+	key := generateKeyForCrawler(href)
 
 	if !Synchronize(key, etcdInteractor) {
 		return
 	}
 
-	log.Println("process key:", key)
+	log.Println("process:", href)
 
-	urlHandlers := []HrefHandler{
-		NewHandlerWithFilters(handleHrefWithAbsolutePathAndHTMLFile, filterHrefWithAbsolutePath, filterHrefWithHTMLFile),
-		NewHandlerWithFilters(handleHrefWithAbsolutePathAndNotFile, filterHrefWithAbsolutePath, filterHrefWithNotFile),
-		NewHandlerWithFilters(handleHrefWithRelativePathAndHTMLFile, filterHrefWithRelativePath, filterHrefWithHTMLFile),
-		NewHandlerWithFilters(handleHrefWithRelativePathAndNotFile, filterHrefWithRelativePath, filterHrefWithNotFile),
+	url, err := url.Parse(href)
+	if err != nil {
+		log.Println("error:", err)
+		return
+	}
+
+	hrefHandlers := []HrefHandler{
+		NewHandlerWithFilters(handleHrefWithAbsolutePath, filterHrefWithAbsolutePath),
+		NewHandlerWithFilters(handleHrefWithRelativePath, filterHrefWithRelativePath),
 		NewHandlerWithFilters(handleHrefWithJS, filterHrefWithJS),
 	}
 
-	for _, handler := range urlHandlers {
-		handler(url)
+	for _, handler := range hrefHandlers {
+		if handler(url, c) {
+			tryRedirectURL(url)
+			downloadURL(url, etcdInteractor)
+		}
 	}
 }
 
-func generateKeyFromURL(url string) string {
+func generateKeyForCrawler(url string) string {
 	return path.Join("/crawler", url)
+}
+
+func downloadURL(u *url.URL, etcdInteractor etcd.Interactor) {
+	if u.String() == "" {
+		return
+	}
+
+	key := generateKeyForCrawler(path.Join("/download", u.String()))
+	if !Synchronize(key, etcdInteractor) {
+		return
+	}
+
+	if err := htmlutil.DownloadURL(u, path.Join(pathutils.GetModulePath("CrawlerDemo"), "download")); err != nil {
+		log.Println("error:", err)
+		return
+	}
+
+	log.Println("download:", u)
 }

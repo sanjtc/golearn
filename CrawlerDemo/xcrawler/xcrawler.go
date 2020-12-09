@@ -6,18 +6,22 @@ import (
 	"net/http"
 
 	"github.com/pantskun/commonutils/container"
+	"github.com/pantskun/golearn/CrawlerDemo/htmlutil"
 	"golang.org/x/net/html"
 )
 
 type Crawler interface {
 	Visit(url string)
+	GetHost() string
 
 	// AddHTMLHandler
 	// handle html node with filters, filters will be executed in order of input.
-	AddHTMLHandler(handler HTMLHandler, filters ...HTMLNodeFilter)
+	AddHTMLHandler(handler HTMLHandler, filters ...HTMLFilter)
 }
 
 type crawler struct {
+	rawURL           string
+	host             string
 	rootNode         *html.Node
 	htmlNodeHandlers []HTMLHandler
 }
@@ -29,21 +33,28 @@ func NewCrawler() Crawler {
 }
 
 func (c *crawler) Visit(url string) {
+	c.rawURL = url
+	c.host = htmlutil.GetDomainFromURL(url)
+
 	if err := c.getRootNode(url); err != nil {
-		log.Println(err)
+		log.Println("error:", err)
 		return
 	}
 
 	c.traversingAllNode()
 }
 
-func (c *crawler) AddHTMLHandler(handler HTMLHandler, filters ...HTMLNodeFilter) {
-	h := func(node *html.Node) {
-		if !FilterHTMLNode(node, filters...) {
+func (c *crawler) GetHost() string {
+	return c.host
+}
+
+func (c *crawler) AddHTMLHandler(handler HTMLHandler, filters ...HTMLFilter) {
+	h := func(node *html.Node, c Crawler) {
+		if !FilterHTML(node, filters...) {
 			return
 		}
 
-		handler(node)
+		handler(node, c)
 	}
 
 	c.htmlNodeHandlers = append(c.htmlNodeHandlers, h)
@@ -67,7 +78,7 @@ func (c *crawler) getRootNode(url string) error {
 
 func (c *crawler) traversingAllNode() {
 	if c.rootNode == nil {
-		log.Println("root node is nil")
+		log.Println("warning:", "root node is nil")
 		return
 	}
 
@@ -78,7 +89,7 @@ func (c *crawler) traversingAllNode() {
 		curNode := queue.Pop().(*html.Node)
 
 		for _, handler := range c.htmlNodeHandlers {
-			handler(curNode)
+			handler(curNode, c)
 		}
 
 		childNode := curNode.FirstChild

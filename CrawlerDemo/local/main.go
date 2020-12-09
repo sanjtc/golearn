@@ -46,7 +46,14 @@ func main() {
 
 	// start n processes
 	mainPath := path.Join(pathutils.GetModulePath("CrawlerDemo"), "crawler", "main.go")
-	multiProcCmd := osutils.NewMultiProcCmd(procNum, "go", "run", mainPath, "-url", url)
+
+	var multiProcCmd osutils.MultiProcCmd
+
+	if procNum > 1 {
+		multiProcCmd = osutils.NewMultiProcCmd(procNum, "go", "run", mainPath, "-url", url, "-useMultiprocess")
+	} else {
+		multiProcCmd = osutils.NewMultiProcCmd(procNum, "go", "run", mainPath, "-url", url)
+	}
 
 	if startEtcdCmd.GetCmdState() == osutils.ECmdStateError {
 		log.Println(startEtcdCmd.GetCmdError())
@@ -83,7 +90,7 @@ func waitingResult(waitChan, interruptChan chan int, cmds []osutils.Command) str
 					continue
 				}
 				if err := cmd. /*Process.*/ Kill(); err != nil {
-					log.Println(err)
+					log.Println("error:", err)
 				}
 			}
 			return interruptMsg
@@ -128,7 +135,7 @@ func processRemoteInterrupt(listenAddr string, interruptChan chan int) {
 	go func() {
 		err := listenRemoteInterrupt(listenAddr, interruptChan)
 		if err != nil {
-			log.Println(err)
+			log.Println("error:", err)
 		}
 	}()
 }

@@ -101,7 +101,7 @@ func main() {
 		case <-ctx.Done():
 			{
 				if err := ProcessInterrupt(remoteIP, "2233"); err != nil {
-					log.Println(err)
+					log.Println("error:", err)
 				}
 			}
 		default:

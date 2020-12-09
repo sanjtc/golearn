@@ -2,9 +2,9 @@ package xcrawler
 
 import "golang.org/x/net/html"
 
-type HTMLNodeFilter func(*html.Node) bool
+type HTMLFilter func(*html.Node) bool
 
-func FilterHTMLNode(node *html.Node, filters ...HTMLNodeFilter) bool {
+func FilterHTML(node *html.Node, filters ...HTMLFilter) bool {
 	for _, filter := range filters {
 		if !filter(node) {
 			return false

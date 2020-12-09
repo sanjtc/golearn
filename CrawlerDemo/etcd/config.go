@@ -35,7 +35,7 @@ func GetClientConfig(filePath string) clientv3.Config {
 
 	var fileConfigs EtcdConfigs
 	if err := json.Unmarshal(fb, &fileConfigs); err != nil {
-		log.Println(err)
+		log.Println("error:", err)
 		return defaultConfig
 	}
 

@@ -1,12 +1,12 @@
 package htmlutil
 
 import (
-	"fmt"
 	"io/ioutil"
 	"net/http"
+	"net/url"
 	"path"
+	"strings"
 
-	"github.com/pantskun/commonutils/pathutils"
 	"golang.org/x/net/html"
 )
 
@@ -28,14 +28,25 @@ func GetElementAttributeValue(element *html.Node, attribute string) string {
 
 // DownloadURL
 // 下载url至p位置
-func DownloadURL(url string, des string) error {
-	rsp, err := http.Get(fmt.Sprint(url))
+func DownloadURL(u *url.URL, des string) error {
+	rsp, err := http.Get(u.String())
 	if err != nil {
 		return err
 	}
 	defer rsp.Body.Close()
 
-	filePath := path.Join(des, pathutils.GetURLPath(url))
+	// switch rsp.StatusCode {
+	// case http.StatusOK, http.StatusCreated, http.StatusAccepted:
+	// 	break
+	// default:
+	// 	return errors.New(rsp.Status)
+	// }
+
+	filePath := path.Join(des, u.Host, u.Path)
+
+	if !strings.Contains(u.Path, ".") {
+		filePath = path.Join(filePath, "index.html")
+	}
 
 	body, err := ioutil.ReadAll(rsp.Body)
 	if err != nil {
@@ -43,4 +54,20 @@ func DownloadURL(url string, des string) error {
 	}
 
 	return writeToFile(filePath, body)
+}
+
+func GetDomainFromURL(url string) string {
+	ss := strings.Split(url, "://")
+	if len(ss) == 1 {
+		return ""
+	}
+
+	s := ss[1]
+
+	i := strings.Index(s, "/")
+	if i == -1 {
+		return s
+	}
+
+	return s[:i]
 }

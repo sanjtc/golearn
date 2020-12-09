@@ -1,15 +1,15 @@
 package crawlerutil
 
 import (
-	"path"
+	"net/url"
 	"strings"
 )
 
-type HrefFilter func(string) bool
+type HrefFilter func(u *url.URL) bool
 
-func FilterHref(href string, filters ...HrefFilter) bool {
+func FilterHref(u *url.URL, filters ...HrefFilter) bool {
 	for _, filter := range filters {
-		if !filter(href) {
+		if !filter(u) {
 			return false
 		}
 	}
@@ -17,23 +17,34 @@ func FilterHref(href string, filters ...HrefFilter) bool {
 	return true
 }
 
-func filterHrefWithAbsolutePath(href string) bool {
-	return strings.HasPrefix(href, "http://") || strings.HasPrefix(href, "https://")
+func filterHrefWithAbsolutePath(u *url.URL) bool {
+	return u.Scheme == "https" || u.Scheme == "http"
 }
 
-func filterHrefWithRelativePath(href string) bool {
-	return strings.HasPrefix(href, "/")
+func filterHrefWithRelativePath(u *url.URL) bool {
+	return u.Scheme == ""
 }
 
-func filterHrefWithHTMLFile(href string) bool {
-	ext := path.Ext(href)
-	return ext == ".html"
+func filterHrefWithFile(u *url.URL) bool {
+	i := strings.Index(u.Path, ".")
+
+	return i != -1
 }
 
-func filterHrefWithNotFile(href string) bool {
-	return strings.HasSuffix(href, "/")
+func filterHrefWithoutFile(u *url.URL) bool {
+	i := strings.Index(u.Path, ".")
+
+	return i == -1
 }
 
-func filterHrefWithJS(href string) bool {
-	return strings.HasPrefix(href, "javascript:")
+func filterHrefWithJS(u *url.URL) bool {
+	return u.Scheme == "javascript"
+}
+
+func filterHrefWithQuery(u *url.URL) bool {
+	return u.RawQuery != ""
+}
+
+func filterHrefWithoutQuery(u *url.URL) bool {
+	return u.RawQuery == ""
 }
