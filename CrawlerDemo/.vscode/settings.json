@@ -1,5 +1,103 @@
 {
-    "cmake.configureOnOpen": false,
+    "editor.acceptSuggestionOnEnter": "off",
+    "editor.acceptSuggestionOnCommitCharacter": false,
+    "go.gotoSymbol.includeImports": true,
+    "workbench.startupEditor": "none",
+    "gitlens.hovers.currentLine.enabled": false,
+    "gitlens.hovers.currentLine.over": "line",
+    "gitlens.codeLens.scopes": [
+        "document"
+    ], // Flags to pass to `go test`. If null, then buildFlags will be used.   
+    "go.testFlags": [
+        "-test.v"
+    ],
+    "go.docsTool": "gogetdoc",
+    "bracketPairColorizer.forceUniqueOpeningColor": true,
+    "go.testTimeout": "300s",
+    "go.useLanguageServer": true,
+    "todo-tree.highlights.customHighlight": {
+        "TODO": {
+            "icon": "flame",
+            "foreground": "#FFA500",
+            "type": "text"
+        },
+        "FIXME": {
+            "icon": "tools",
+            "foreground": "#FF00FF",
+            "type": "text"
+        }
+    },
+    "todo-tree.highlights.defaultHighlight": {
+        "icon": "eye",
+        "type": "tag"
+    },
+    "files.associations": {
+        "*.json": "jsonc"
+    },
+    "todo-tree.tree.showScanModeButton": false,
+    "protoc": {
+        "options": [
+            "-I$GOPATH/src/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis"
+        ]
+    },
+    "git.autofetch": true,
+    "go.formatTool": "goimports",
+    "go.lintFlags": [
+        "-E",
+        "bodyclose", //: checks whether HTTP response body is closed successfully [fast: true, auto-fix: false]
+        "-E",
+        "exhaustive", //: check exhaustiveness of enum switch statements [fast: true, auto-fix: false]
+        "-E",
+        "exportloopref", //: checks for pointers to enclosing loop variables [fast: true, auto-fix: false]
+        "-E",
+        "gochecknoglobals", //: Checks that no globals are present in Go code [fast: true, auto-fix: false]
+        "-E",
+        "gochecknoinits", //: Checks that no init functions are present in Go code [fast: true, auto-fix: false]
+        "-E",
+        "goconst", //: Finds repeated strings that could be replaced by a constant [fast: true, auto-fix: false]
+        "-E",
+        "gocritic", //: The most opinionated Go source code linter [fast: true, auto-fix: false]
+        "-E",
+        "godot", //: Check if comments end in a period [fast: true, auto-fix: true]
+        "-E",
+        "goerr113", //: Golang linter to check the errors handling expressions [fast: true, auto-fix: false]
+        "-E",
+        "gofumpt", //: Gofumpt checks whether code was gofumpt-ed. [fast: true, auto-fix: false]
+        "-E",
+        "goimports", //: Goimports does everything that gofmt does. Additionally it checks unused imports [fast: true, auto-fix: true]golint: Golint differs from gofmt. Gofmt reformats Go source code, whereas golint prints out style mistakes [fast: true, auto-fix: false]
+        "-E",
+        "gomnd", //: An analyzer to detect magic numbers. [fast: true, auto-fix: false]
+        // "-E", "gomodguard",//: Allow and block list linter for direct Go module dependencies. This is different from depguard where there are different block types for example version constraints and module recommendations. [fast: true, auto-fix: false]
+        "-E",
+        "goprintffuncname", //: Checks that printf-like functions are named with `f` at the end [fast: true, auto-fix: false]
+        "-E",
+        "gosec", // (gas): Inspects source code for security problems [fast: true, auto-fix: false]
+        "-E",
+        "maligned", //: Tool to detect Go structs that would take less memory if their fields were sorted [fast: true, auto-fix: false]
+        "-E",
+        "nolintlint", //: Reports ill-formed or insufficient nolint directives [fast: true, auto-fix: false]
+        "-E",
+        "prealloc", //: Finds slice declarations that could potentially be preallocated [fast: true, auto-fix: false]
+        "-E",
+        "rowserrcheck", //: checks whether Err of rows is checked successfully [fast: true, auto-fix: false]
+        "-E",
+        "scopelint", //: Scopelint checks for unpinned variables in go programs [fast: true, auto-fix: false]
+        "-E",
+        "sqlclosecheck", //: Checks that sql.Rows and sql.Stmt are closed. [fast: true, auto-fix: false]
+        "-E",
+        "stylecheck", //: Stylecheck is a replacement for golint [fast: true, auto-fix: false]
+        // "-E", "testpackage",//: linter that makes you use a separate _test package [fast: true, auto-fix: false]
+        "-E",
+        "unconvert", //: Remove unnecessary type conversions [fast: true, auto-fix: false]
+        "-E",
+        "unparam", //: Reports unused function parameters [fast: true, auto-fix: false]
+        "-E",
+        "whitespace", //: Tool for detection of leading and trailing whitespace [fast: true, auto-fix: true]
+        "-E",
+        "wsl" //: Whitespace Linter - Forces you to use empty lines! [fast: true, auto-fix: false]
+    ],
+    "go.lintTool": "golangci-lint",
 
-    // "go.vetFlags": ["-printfuncs=testf"], // 无效
+    // python
+    "python.pythonPath": "C:\\Users\\wangx\\Anaconda3\\envs\\py3.7\\python.exe"
 }

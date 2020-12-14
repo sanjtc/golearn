@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/coreos/etcd/clientv3"
+	"github.com/pantskun/golearn/CrawlerDemo/xlogutil"
 )
 
 // GetClientConfig
@@ -35,7 +36,7 @@ func GetClientConfig(filePath string) clientv3.Config {
 
 	var fileConfigs EtcdConfigs
 	if err := json.Unmarshal(fb, &fileConfigs); err != nil {
-		log.Println("error:", err)
+		xlogutil.Error(err)
 		return defaultConfig
 	}
 

@@ -11,7 +11,7 @@ import (
 	"github.com/pantskun/commonutils/pathutils"
 )
 
-const timeoutSecond = 5.0
+const timeoutSecond = 1000.0
 
 type Interactor interface {
 	Close()
@@ -50,15 +50,15 @@ func NewInteractorWithEmbed() (Interactor, error) {
 	c := v3client.New(e.etcd.Server)
 
 	// new seesion, new mutex
-	ctx, cancel := context.WithTimeout(context.TODO(), timeoutSecond*time.Second)
-	defer cancel()
+	// ctx, cancel := context.WithTimeout(context.TODO(), timeoutSecond*time.Second)
+	// defer cancel()
 
-	s, ce := concurrency.NewSession(c, concurrency.WithContext(ctx))
+	s, ce := concurrency.NewSession(c /*concurrency.WithContext(ctx),*/, concurrency.WithTTL(300))
 	if ce != nil {
 		return nil, ce
 	}
 
-	m := concurrency.NewMutex(s, "/my-lock/")
+	m := concurrency.NewMutex(s, "/crawler-lock/")
 
 	return &interactor{e, c, s, m}, nil
 }
@@ -84,7 +84,7 @@ func NewInteractor() (Interactor, error) {
 		return nil, ce
 	}
 
-	m := concurrency.NewMutex(s, "/my-lock/")
+	m := concurrency.NewMutex(s, "/crawler-lock/")
 
 	return &interactor{nil, c, s, m}, nil
 }

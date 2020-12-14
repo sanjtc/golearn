@@ -35,13 +35,6 @@ func DownloadURL(u *url.URL, des string) error {
 	}
 	defer rsp.Body.Close()
 
-	// switch rsp.StatusCode {
-	// case http.StatusOK, http.StatusCreated, http.StatusAccepted:
-	// 	break
-	// default:
-	// 	return errors.New(rsp.Status)
-	// }
-
 	filePath := path.Join(des, u.Host, u.Path)
 
 	if !strings.Contains(u.Path, ".") {
@@ -53,7 +46,7 @@ func DownloadURL(u *url.URL, des string) error {
 		return err
 	}
 
-	return writeToFile(filePath, body)
+	return WriteToFile(filePath, body)
 }
 
 func GetDomainFromURL(url string) string {

@@ -1,107 +1,177 @@
 package xcrawler
 
 import (
-	"fmt"
 	"log"
 	"net/http"
+	"net/url"
 
 	"github.com/pantskun/commonutils/container"
-	"github.com/pantskun/golearn/CrawlerDemo/htmlutil"
+	"github.com/pantskun/golearn/CrawlerDemo/xlogutil"
 	"golang.org/x/net/html"
 )
 
 type Crawler interface {
 	Visit(url string)
-	GetHost() string
 
 	// AddHTMLHandler
 	// handle html node with filters, filters will be executed in order of input.
 	AddHTMLHandler(handler HTMLHandler, filters ...HTMLFilter)
+
+	AddRequestHandler(handler RequestHandler, filters ...RequestFilter)
+	AddResponseHandler(handler ResponseHandler, filters ...ResponseFilter)
 }
 
 type crawler struct {
-	rawURL           string
-	host             string
-	rootNode         *html.Node
-	htmlNodeHandlers []HTMLHandler
+	maxDepth int
+
+	htmlHandlers     []HTMLHandler
+	requestHandlers  []RequestHandler
+	responseHandlers []ResponseHandler
 }
 
 var _ Crawler = (*crawler)(nil)
 
-func NewCrawler() Crawler {
-	return &crawler{}
+func NewCrawler(maxDepth int) Crawler {
+	return &crawler{maxDepth: maxDepth}
 }
 
-func (c *crawler) Visit(url string) {
-	c.rawURL = url
-	c.host = htmlutil.GetDomainFromURL(url)
-
-	if err := c.getRootNode(url); err != nil {
-		log.Println("error:", err)
+func (c *crawler) Visit(u string) {
+	ut, err := url.Parse(u)
+	if err != nil {
+		xlogutil.Error(err)
 		return
 	}
 
-	c.traversingAllNode()
-}
-
-func (c *crawler) GetHost() string {
-	return c.host
+	c.visit(ut, 0)
 }
 
 func (c *crawler) AddHTMLHandler(handler HTMLHandler, filters ...HTMLFilter) {
-	h := func(node *html.Node, c Crawler) {
-		if !FilterHTML(node, filters...) {
+	h := func(element HTMLElement) {
+		if !FilterHTML(element, filters...) {
 			return
 		}
 
-		handler(node, c)
+		handler(element)
 	}
 
-	c.htmlNodeHandlers = append(c.htmlNodeHandlers, h)
+	c.htmlHandlers = append(c.htmlHandlers, h)
 }
 
-func (c *crawler) getRootNode(url string) error {
-	resp, err := http.Get(fmt.Sprint(url))
-	if err != nil {
-		return err
+func (c *crawler) AddRequestHandler(handler RequestHandler, filters ...RequestFilter) {
+	h := func(req *http.Request) {
+		if !FilterRequest(req, filters...) {
+			return
+		}
+
+		handler(req)
 	}
 
-	c.rootNode, err = html.Parse(resp.Body)
-	resp.Body.Close()
-
-	if err != nil {
-		return err
-	}
-
-	return nil
+	c.requestHandlers = append(c.requestHandlers, h)
 }
 
-func (c *crawler) traversingAllNode() {
-	if c.rootNode == nil {
+func (c *crawler) AddResponseHandler(handler ResponseHandler, filters ...ResponseFilter) {
+	h := func(resp *http.Response) {
+		if !FilterResponse(resp, filters...) {
+			return
+		}
+
+		handler(resp)
+	}
+
+	c.responseHandlers = append(c.responseHandlers, h)
+}
+
+func (c *crawler) visit(u *url.URL, depth int) {
+	log.Println("visit:", u.String(), ", depth:", depth)
+
+	if c.maxDepth > 0 && depth >= c.maxDepth {
+		return
+	}
+
+	rootNode := c.getRootNode(u)
+
+	if rootNode == nil {
+		xlogutil.Warning("root node is nil, skip")
+		return
+	}
+
+	rootElement := NewHTMLElement(rootNode, u, depth, c)
+
+	c.traversingAllElement(rootElement)
+}
+
+func (c *crawler) getRootNode(u *url.URL) *html.Node {
+	client := &http.Client{
+		CheckRedirect: func(req *http.Request, via []*http.Request) error {
+			return http.ErrUseLastResponse
+		},
+	}
+
+	req := &http.Request{
+		Method: "GET",
+		URL:    u,
+		Header: http.Header{
+			"User-Agent": []string{"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36 Edg/87.0.664.60"},
+		},
+	}
+
+	for _, handler := range c.requestHandlers {
+		handler(req)
+	}
+
+	// request经处理后为nil，则不发起请求
+	if req.URL == nil {
+		return nil
+	}
+
+	resp, err := client.Do(req)
+	if err != nil {
+		xlogutil.Error(err)
+		return nil
+	}
+
+	defer resp.Body.Close()
+
+	for _, handler := range c.responseHandlers {
+		handler(resp)
+	}
+
+	rootNode, err := html.Parse(resp.Body)
+
+	if err != nil {
+		xlogutil.Error(err)
+		return nil
+	}
+
+	return rootNode
+}
+
+func (c *crawler) traversingAllElement(rootElement HTMLElement) {
+	if rootElement == nil {
 		log.Println("warning:", "root node is nil")
 		return
 	}
 
 	queue := container.Queue{}
-	queue.Push(c.rootNode)
+	queue.Push(rootElement)
 
 	for !queue.IsEmpty() {
-		curNode := queue.Pop().(*html.Node)
+		curElement := queue.Pop().(HTMLElement)
 
-		for _, handler := range c.htmlNodeHandlers {
-			handler(curNode, c)
+		for _, handler := range c.htmlHandlers {
+			handler(curElement)
 		}
 
-		childNode := curNode.FirstChild
-		if childNode == nil {
+		childElement := curElement.GetFirstChild()
+		if childElement == nil {
 			continue
 		}
 
-		for childNode != curNode.LastChild {
-			queue.Push(childNode)
-			childNode = childNode.NextSibling
+		for !childElement.Equal(curElement.GetLastChild()) {
+			queue.Push(childElement)
+			childElement = childElement.GetNextSibling()
 		}
 
-		queue.Push(childNode)
+		queue.Push(childElement)
 	}
 }

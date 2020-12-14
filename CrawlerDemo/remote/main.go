@@ -11,6 +11,7 @@ import (
 	"github.com/pantskun/commonutils/osutils"
 	"github.com/pantskun/commonutils/pathutils"
 	"github.com/pantskun/commonutils/taskutils"
+	"github.com/pantskun/golearn/CrawlerDemo/xlogutil"
 	"github.com/pantskun/remotelib/remotesftp"
 	"github.com/pantskun/remotelib/remotessh"
 )
@@ -101,7 +102,7 @@ func main() {
 		case <-ctx.Done():
 			{
 				if err := ProcessInterrupt(remoteIP, "2233"); err != nil {
-					log.Println("error:", err)
+					xlogutil.Error(err)
 				}
 			}
 		default:

@@ -1,5 +1,9 @@
 package xcrawler
 
-import "golang.org/x/net/html"
+import "net/http"
 
-type HTMLHandler func(*html.Node, Crawler)
+type HTMLHandler func(HTMLElement)
+
+type RequestHandler func(*http.Request)
+
+type ResponseHandler func(*http.Response)

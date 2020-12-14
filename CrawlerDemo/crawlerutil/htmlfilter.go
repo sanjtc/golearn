@@ -1,7 +1,9 @@
 package crawlerutil
 
-import "golang.org/x/net/html"
+import (
+	"github.com/pantskun/golearn/CrawlerDemo/xcrawler"
+)
 
-func FilterANode(node *html.Node) bool {
-	return node.Data == "a"
+func FilterElementWithURL(element xcrawler.HTMLElement) bool {
+	return element.GetAttr("href") != "" || element.GetAttr("src") != ""
 }

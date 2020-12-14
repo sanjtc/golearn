@@ -1,9 +1,8 @@
 package crawlerutil
 
 import (
-	"log"
-
 	"github.com/pantskun/golearn/CrawlerDemo/etcd"
+	"github.com/pantskun/golearn/CrawlerDemo/xlogutil"
 )
 
 // SynchronizeWithETCD
@@ -15,28 +14,28 @@ func Synchronize(key string, etcdInteractor etcd.Interactor) bool {
 
 	// lock
 	if _, err := etcdInteractor.Lock(); err != nil {
-		log.Println("error:", err)
+		xlogutil.Error(err)
 		return false
 	}
 
 	defer func() {
 		// unlock
 		if _, err := etcdInteractor.Unlock(); err != nil {
-			log.Println("error:", err)
+			xlogutil.Error(err)
 		}
 	}()
 
 	// check url
 	res, err := etcdInteractor.Get(key)
 	if err != nil {
-		log.Println("error:", err)
+		xlogutil.Error(err)
 		return false
 	}
 
 	if res == "" {
 		err := etcdInteractor.Put(key, "1")
 		if err != nil {
-			log.Println("error:", err)
+			xlogutil.Error(err)
 			return false
 		}
 

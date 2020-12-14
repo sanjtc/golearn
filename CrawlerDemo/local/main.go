@@ -10,6 +10,7 @@ import (
 
 	"github.com/pantskun/commonutils/osutils"
 	"github.com/pantskun/commonutils/pathutils"
+	"github.com/pantskun/golearn/CrawlerDemo/xlogutil"
 )
 
 const interruptMsg = "interrupt"
@@ -90,7 +91,7 @@ func waitingResult(waitChan, interruptChan chan int, cmds []osutils.Command) str
 					continue
 				}
 				if err := cmd. /*Process.*/ Kill(); err != nil {
-					log.Println("error:", err)
+					xlogutil.Error(err)
 				}
 			}
 			return interruptMsg
@@ -135,7 +136,7 @@ func processRemoteInterrupt(listenAddr string, interruptChan chan int) {
 	go func() {
 		err := listenRemoteInterrupt(listenAddr, interruptChan)
 		if err != nil {
-			log.Println("error:", err)
+			xlogutil.Error(err)
 		}
 	}()
 }

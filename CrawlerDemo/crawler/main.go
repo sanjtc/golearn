@@ -2,12 +2,12 @@ package main
 
 import (
 	"flag"
-	"log"
+	"net/http"
 
 	"github.com/pantskun/golearn/CrawlerDemo/crawlerutil"
 	"github.com/pantskun/golearn/CrawlerDemo/etcd"
 	"github.com/pantskun/golearn/CrawlerDemo/xcrawler"
-	"golang.org/x/net/html"
+	"github.com/pantskun/golearn/CrawlerDemo/xlogutil"
 )
 
 func main() {
@@ -16,7 +16,7 @@ func main() {
 		useMultiprocess bool
 	)
 
-	flag.StringVar(&url, "url", "https://www.ssetech.com.cn/", "url")
+	flag.StringVar(&url, "url", "https://www.ssetech.com.cn", "url")
 	flag.BoolVar(&useMultiprocess, "useMultiprocess", false, "use multiprocess")
 	flag.Parse()
 
@@ -25,19 +25,33 @@ func main() {
 	if useMultiprocess {
 		i, err := etcd.NewInteractor()
 		if err != nil {
-			log.Println("error:", err)
+			xlogutil.Error(err)
+			return
+		}
+
+		etcdInteractor = i
+	} else {
+		i, err := etcd.NewInteractorWithEmbed()
+		if err != nil {
+			xlogutil.Error(err)
 			return
 		}
 
 		etcdInteractor = i
 	}
 
-	handleHref := func(node *html.Node, c xcrawler.Crawler) {
-		crawlerutil.HandleHref(node, c, etcdInteractor)
+	handleHTML := func(element xcrawler.HTMLElement) {
+		crawlerutil.HandleElementWithURL(element, etcdInteractor)
 	}
 
-	c := xcrawler.NewCrawler()
+	handleReq := func(req *http.Request) {
+		crawlerutil.HandleRequestWithSync(req, etcdInteractor)
+	}
 
-	c.AddHTMLHandler(handleHref, crawlerutil.FilterANode)
+	c := xcrawler.NewCrawler(2)
+
+	c.AddHTMLHandler(handleHTML, crawlerutil.FilterElementWithURL)
+	c.AddRequestHandler(handleReq)
+
 	c.Visit(url)
 }

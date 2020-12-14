@@ -46,6 +46,12 @@
             "env": {},
             "args": [
             ]
+        },
+        {
+            "name":"Launch py",
+            "type": "python",
+            "request": "launch",
+            "program": "${file}",
         }
     ]
 }

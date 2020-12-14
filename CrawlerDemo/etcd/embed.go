@@ -2,10 +2,10 @@ package etcd
 
 import (
 	"io/ioutil"
-	"log"
 	"os"
 
 	"github.com/coreos/etcd/embed"
+	"github.com/pantskun/golearn/CrawlerDemo/xlogutil"
 )
 
 type embedetcd struct {
@@ -16,7 +16,7 @@ type embedetcd struct {
 func newEmbedetcd() (*embedetcd, error) {
 	tdir, err := ioutil.TempDir(os.TempDir(), "embedetcd")
 	if err != nil {
-		log.Println("error:", err)
+		xlogutil.Error(err)
 		return nil, err
 	}
 
