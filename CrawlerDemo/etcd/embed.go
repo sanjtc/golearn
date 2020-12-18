@@ -5,7 +5,6 @@ import (
 	"os"
 
 	"github.com/coreos/etcd/embed"
-	"github.com/pantskun/golearn/CrawlerDemo/xlogutil"
 )
 
 type embedetcd struct {
@@ -16,7 +15,6 @@ type embedetcd struct {
 func newEmbedetcd() (*embedetcd, error) {
 	tdir, err := ioutil.TempDir(os.TempDir(), "embedetcd")
 	if err != nil {
-		xlogutil.Error(err)
 		return nil, err
 	}
 

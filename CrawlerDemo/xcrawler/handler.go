@@ -1,9 +1,7 @@
 package xcrawler
 
-import "net/http"
-
 type HTMLHandler func(HTMLElement)
 
-type RequestHandler func(*http.Request)
+type RequestHandler func(Request)
 
-type ResponseHandler func(*http.Response)
+type ResponseHandler func(Response)

@@ -2,26 +2,40 @@ package crawlerutil
 
 import (
 	"testing"
+
+	"github.com/golang/mock/gomock"
+	"github.com/pantskun/golearn/CrawlerDemo/mock/mock_xcrawler"
+	"github.com/pantskun/golearn/CrawlerDemo/xcrawler"
+	"gotest.tools/assert"
 )
 
-func TestFilterANode(t *testing.T) {
-	// ANode := html.Node{Data: "a"}
-	// OtherNode1 := html.Node{Data: "h"}
-	// OtherNode2 := html.Node{Data: ""}
+func TestFilterElementWithURL(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
 
-	// type TestCase struct {
-	// 	node     *html.Node
-	// 	expected bool
-	// }
+	hrefElement := mock_xcrawler.NewMockHTMLElement(ctrl)
+	hrefElement.EXPECT().GetAttr("href").Return("testhref")
 
-	// testCases := []TestCase{
-	// 	{node: &ANode, expected: true},
-	// 	{node: &OtherNode1, expected: false},
-	// 	{node: &OtherNode2, expected: false},
-	// }
+	srcElement := mock_xcrawler.NewMockHTMLElement(ctrl)
+	srcElement.EXPECT().GetAttr("href").Return("testsrc")
 
-	// for _, testCase := range testCases {
-	// 	got := xcrawler.FilterHTML(testCase.node, FilterNodeWithURL)
-	// 	assert.Equal(t, testCase.expected, got)
-	// }
+	unvaildElement := mock_xcrawler.NewMockHTMLElement(ctrl)
+	unvaildElement.EXPECT().GetAttr("src").Return("")
+	unvaildElement.EXPECT().GetAttr("href").Return("")
+
+	type TestCase struct {
+		element  xcrawler.HTMLElement
+		expected bool
+	}
+
+	testCases := []TestCase{
+		{hrefElement, true},
+		{srcElement, true},
+		{unvaildElement, false},
+	}
+
+	for _, testCase := range testCases {
+		got := FilterElementWithURL(testCase.element)
+		assert.Equal(t, testCase.expected, got)
+	}
 }

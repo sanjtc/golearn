@@ -26,8 +26,6 @@ func WriteToFile(filePath string, content []byte) error {
 
 	file.Close()
 
-	// log.Println("write:", file.Name())
-
 	return nil
 }
 

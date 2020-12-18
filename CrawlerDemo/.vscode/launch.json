@@ -22,7 +22,7 @@
             "env": {},
             "args": [
                 "-n",
-                "4"
+                "6"
             ]
         },
         {
@@ -34,7 +34,7 @@
             "env": {},
             "args": [
                 "-n",
-                "4"
+                "6"
             ]
         },
         {
@@ -45,6 +45,10 @@
             "program": "${workspaceFolder}/crawler/main.go",
             "env": {},
             "args": [
+                "-depth",
+                "2",
+                "-log",
+                "crawler.txt"
             ]
         },
         {

@@ -93,6 +93,9 @@ github.com/dgrijalva/jwt-go v3.2.0+incompatible/go.mod h1:E3ru+11k8xSBh+hMPgOLZm
 github.com/dimchansky/utfbom v1.1.0/go.mod h1:rO41eb7gLfo8SF1jd9F8HplJm1Fewwi4mQvIirEdv+8=
 github.com/dnaeon/go-vcr v0.0.0-20180814043457-aafff18a5cc2/go.mod h1:aBB1+wY4s93YsC3HHjMBMrwTj2R9FHDzUr9KyGc8n1E=
 github.com/dnsimple/dnsimple-go v0.30.0/go.mod h1:O5TJ0/U6r7AfT8niYNlmohpLbCSG+c71tQlGr9SeGrg=
+github.com/docker/docker v1.13.1 h1:IkZjBSIc8hBjLpqeAbeE5mca5mNgeatLHBy3GO78BWo=
+github.com/docker/docker v20.10.1+incompatible h1:u0HIBLwOJdemyBdTCkoBX34u3lb5KyBo0rQE3a5Yg+E=
+github.com/docker/docker v20.10.1+incompatible/go.mod h1:eEKB0N0r5NX/I1kEveEz05bcu8tLC/8azJZsviup8Sk=
 github.com/dustin/go-humanize v1.0.0 h1:VSnTsYCnlFHaM2/igO1h6X3HA71jcobQuxemgkq4zYo=
 github.com/dustin/go-humanize v1.0.0/go.mod h1:HtrtbFcZ19U5GC7JDqmcUSB87Iq5E25KnS6fMYU6eOk=
 github.com/eapache/go-resiliency v1.1.0/go.mod h1:kFI+JgMyC7bLPUVY133qvEBtVayf5mFgVsvEsIPBvNs=
@@ -296,6 +299,7 @@ github.com/ovh/go-ovh v0.0.0-20181109152953-ba5adb4cf014/go.mod h1:joRatxRJaZBsY
 github.com/oxtoacart/bpool v0.0.0-20190530202638-03653db5a59c/go.mod h1:X07ZCGwUbLaax7L0S3Tw4hpejzu63ZrrQiUe6W0hcy0=
 github.com/pantskun/commonutils v0.1.0 h1:QlEqre/RY73StWaDLQfx3EIIOGxK4dSrnmvj9hNjrrg=
 github.com/pantskun/commonutils v0.1.0/go.mod h1:Z0RJ7a2148xfOWlw2tTS88yScNyryxq1wIlUe3yL1ks=
+github.com/pantskun/golearn v0.0.0-20201214132745-1f2e8e1f0677 h1:47DEQpj8HBSa+/TImW+5JCeuQeRkm5NMpJWZG3hSuFU=
 github.com/pantskun/pathlib v0.0.0-20201021031143-aa61c89a3181 h1:MqVkkrDlu4vN4ApwNuzEcaXCLudB488aGr9wqbus8Gs=
 github.com/pantskun/pathlib v0.0.0-20201021031143-aa61c89a3181/go.mod h1:av+JlQmqnPqIqZR4F0iuBOq2D9YhBHKkBPtmh+w+s4o=
 github.com/pantskun/remotelib v0.1.0 h1:587rzRWP+jAeHV/M/PbohxSqcj8nRmxWm8sSjj0L7Po=

@@ -1,12 +1,10 @@
 package xcrawler
 
-import "net/http"
-
 type HTMLFilter func(HTMLElement) bool
 
-type RequestFilter func(*http.Request) bool
+type RequestFilter func(Request) bool
 
-type ResponseFilter func(*http.Response) bool
+type ResponseFilter func(Response) bool
 
 func FilterHTML(element HTMLElement, filters ...HTMLFilter) bool {
 	for _, filter := range filters {
@@ -18,7 +16,7 @@ func FilterHTML(element HTMLElement, filters ...HTMLFilter) bool {
 	return true
 }
 
-func FilterRequest(req *http.Request, filters ...RequestFilter) bool {
+func FilterRequest(req Request, filters ...RequestFilter) bool {
 	for _, filter := range filters {
 		if !filter(req) {
 			return false
@@ -28,7 +26,7 @@ func FilterRequest(req *http.Request, filters ...RequestFilter) bool {
 	return true
 }
 
-func FilterResponse(resp *http.Response, filters ...ResponseFilter) bool {
+func FilterResponse(resp Response, filters ...ResponseFilter) bool {
 	for _, filter := range filters {
 		if !filter(resp) {
 			return false

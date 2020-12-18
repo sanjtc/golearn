@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"flag"
-	"log"
 	"net"
 	"os"
 	"strconv"
@@ -53,13 +52,13 @@ func main() {
 	uploadTask := taskutils.NewTask(
 		"uploadTask",
 		func() error {
-			log.Println("uploadTask start")
+			xlogutil.Warning("uploadTask start")
 
 			if err := UploadSrc(remoteIP, remotePort, remoteUser, remotePwd, uploadPath); err != nil {
 				return err
 			}
 
-			log.Println("uploadTask finished")
+			xlogutil.Warning("uploadTask finished")
 			return nil
 		},
 	)
@@ -68,13 +67,13 @@ func main() {
 	runTask := taskutils.NewTask(
 		"runTask",
 		func() error {
-			log.Println("runTask start")
+			xlogutil.Warning("runTask start")
 
 			if err := RunSrc(remoteIP, remotePort, remoteUser, remotePwd, procNum, url); err != nil {
 				return err
 			}
 
-			log.Println("runTask finished")
+			xlogutil.Warning("runTask finished")
 			return nil
 		},
 		uploadTask,
@@ -89,12 +88,12 @@ func main() {
 		}
 
 		if uploadTask.GetState() == taskutils.ETaskStateError {
-			log.Println("uploadTask execute failed")
+			xlogutil.Warning("uploadTask execute failed")
 			return
 		}
 
 		if runTask.GetState() == taskutils.ETaskStateError {
-			log.Println("runTask execute failed")
+			xlogutil.Warning("runTask execute failed")
 			return
 		}
 
@@ -158,7 +157,7 @@ func RunSrc(ip, port, user, pwd string, procNum int, url string) error {
 		return err
 	}
 
-	log.Println("stderr: \n", sshInteractor.GetStderr())
+	xlogutil.Warning("stderr: \n", sshInteractor.GetStderr())
 
 	return nil
 }

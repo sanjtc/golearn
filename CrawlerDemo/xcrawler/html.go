@@ -1,15 +1,12 @@
 package xcrawler
 
 import (
-	"net/url"
-
 	"golang.org/x/net/html"
 	"golang.org/x/net/html/atom"
 )
 
 type HTMLElement interface {
 	Equal(HTMLElement) bool
-	Visit(u *url.URL)
 
 	GetParent() HTMLElement
 	GetFirstChild() HTMLElement
@@ -22,29 +19,22 @@ type HTMLElement interface {
 	GetNamespace() string
 	GetAttr(string) string
 
-	GetOwner() *url.URL
+	GetRequest() Request
 }
 
 type htmlElement struct {
-	node  *html.Node
-	owner *url.URL
-
-	depth int
-	c     *crawler
+	node *html.Node
+	req  Request
 }
 
-func NewHTMLElement(node *html.Node, owner *url.URL, depth int, c *crawler) HTMLElement {
-	return &htmlElement{node: node, owner: owner, depth: depth, c: c}
+func NewHTMLElement(node *html.Node, req Request) HTMLElement {
+	return &htmlElement{node: node, req: req}
 }
 
 func (e *htmlElement) Equal(other HTMLElement) bool {
 	o := other.(*htmlElement)
 
-	return e.node == o.node && e.owner == o.owner
-}
-
-func (e *htmlElement) Visit(u *url.URL) {
-	e.c.visit(u, e.depth+1)
+	return e.node == o.node && e.req == o.req
 }
 
 func (e *htmlElement) GetParent() HTMLElement {
@@ -56,7 +46,7 @@ func (e *htmlElement) GetParent() HTMLElement {
 		return nil
 	}
 
-	return &htmlElement{node: e.node.Parent, owner: e.owner, depth: e.depth, c: e.c}
+	return &htmlElement{node: e.node.Parent, req: e.req}
 }
 
 func (e *htmlElement) GetFirstChild() HTMLElement {
@@ -68,7 +58,7 @@ func (e *htmlElement) GetFirstChild() HTMLElement {
 		return nil
 	}
 
-	return &htmlElement{node: e.node.FirstChild, owner: e.owner, depth: e.depth, c: e.c}
+	return &htmlElement{node: e.node.FirstChild, req: e.req}
 }
 
 func (e *htmlElement) GetLastChild() HTMLElement {
@@ -80,7 +70,7 @@ func (e *htmlElement) GetLastChild() HTMLElement {
 		return nil
 	}
 
-	return &htmlElement{node: e.node.LastChild, owner: e.owner, depth: e.depth, c: e.c}
+	return &htmlElement{node: e.node.LastChild, req: e.req}
 }
 
 func (e *htmlElement) GetPrevSibling() HTMLElement {
@@ -92,7 +82,7 @@ func (e *htmlElement) GetPrevSibling() HTMLElement {
 		return nil
 	}
 
-	return &htmlElement{node: e.node.PrevSibling, owner: e.owner, depth: e.depth, c: e.c}
+	return &htmlElement{node: e.node.PrevSibling, req: e.req}
 }
 
 func (e *htmlElement) GetNextSibling() HTMLElement {
@@ -104,12 +94,12 @@ func (e *htmlElement) GetNextSibling() HTMLElement {
 		return nil
 	}
 
-	return &htmlElement{node: e.node.NextSibling, owner: e.owner, depth: e.depth, c: e.c}
+	return &htmlElement{node: e.node.NextSibling, req: e.req}
 }
 
 func (e *htmlElement) GetType() html.NodeType {
 	if e.node == nil {
-		return 0
+		return html.ErrorNode
 	}
 
 	return e.node.Type
@@ -153,6 +143,6 @@ func (e *htmlElement) GetAttr(key string) string {
 	return ""
 }
 
-func (e *htmlElement) GetOwner() *url.URL {
-	return e.owner
+func (e *htmlElement) GetRequest() Request {
+	return e.req
 }

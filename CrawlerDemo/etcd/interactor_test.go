@@ -3,6 +3,7 @@ package etcd
 import (
 	"testing"
 
+	"github.com/pantskun/commonutils/osutils"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -102,10 +103,21 @@ func testLock(t *testing.T, interactor Interactor) {
 }
 
 func TestNewInteractor(t *testing.T) {
+	etcdCmd := osutils.NewCommand("etcd")
+	etcdCmd.RunAsyn()
+
+	defer etcdCmd.Kill()
+
 	interactor, err := NewInteractor()
 	if err != nil {
 		t.Log(err)
 	} else {
 		interactor.Close()
 	}
+}
+
+func TestTxn(t *testing.T) {
+	etcdEmbed, _ := NewInteractorWithEmbed()
+	assert.True(t, etcdEmbed.TxnSync("test1"))
+	assert.False(t, etcdEmbed.TxnSync("test1"))
 }

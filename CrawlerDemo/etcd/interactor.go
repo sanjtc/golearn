@@ -2,13 +2,13 @@ package etcd
 
 import (
 	"context"
-	"log"
 	"time"
 
 	"github.com/coreos/etcd/clientv3"
 	"github.com/coreos/etcd/clientv3/concurrency"
 	"github.com/coreos/etcd/etcdserver/api/v3client"
 	"github.com/pantskun/commonutils/pathutils"
+	"github.com/pantskun/golearn/CrawlerDemo/xlogutil"
 )
 
 const timeoutSecond = 1000.0
@@ -20,6 +20,7 @@ type Interactor interface {
 	Del(key string) error
 	Lock() (context.CancelFunc, error)
 	Unlock() (context.CancelFunc, error)
+	TxnSync(key string) bool
 }
 
 type interactor struct {
@@ -71,16 +72,14 @@ func NewInteractor() (Interactor, error) {
 
 	c, err := clientv3.New(config)
 	if err != nil {
-		return nil, err
 	}
 
 	// new seesion, new mutex
-	ctx, cancel := context.WithTimeout(context.TODO(), timeoutSecond*time.Second)
-	defer cancel()
+	// ctx, cancel := context.WithTimeout(context.TODO(), timeoutSecond*time.Second)
+	// defer cancel()
 
-	s, ce := concurrency.NewSession(c, concurrency.WithContext(ctx))
+	s, ce := concurrency.NewSession(c /*concurrency.WithContext(ctx),*/, concurrency.WithTTL(300))
 	if ce != nil {
-		log.Println(ce)
 		return nil, ce
 	}
 
@@ -158,4 +157,21 @@ func (i *interactor) Unlock() (context.CancelFunc, error) {
 	}
 
 	return cancel, nil
+}
+
+func (i *interactor) TxnSync(key string) bool {
+	ctx, cancel := context.WithTimeout(context.TODO(), timeoutSecond*time.Second)
+	defer cancel()
+
+	txn := i.c.Txn(ctx)
+	txn = txn.If(clientv3.Compare(clientv3.CreateRevision(key), "=", 0))
+	txn = txn.Then(clientv3.OpPut(key, "1"))
+	resp, err := txn.Commit()
+
+	if err != nil {
+		xlogutil.Error(err)
+		return false
+	}
+
+	return resp.Succeeded
 }

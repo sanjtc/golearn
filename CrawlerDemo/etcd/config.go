@@ -3,7 +3,6 @@ package etcd
 import (
 	"encoding/json"
 	"io/ioutil"
-	"log"
 	"os"
 	"time"
 
@@ -23,7 +22,7 @@ func GetClientConfig(filePath string) clientv3.Config {
 
 	f, err := os.Open(filePath)
 	if err != nil {
-		log.Println("can not find config file, use default config\n", defaultConfig)
+		xlogutil.Warning("can not find config file, use default config\n", defaultConfig)
 		return defaultConfig
 	}
 

@@ -4,9 +4,9 @@ import (
 	"net/url"
 )
 
-type HrefFilter func(u *url.URL) bool
+type URLFilter func(u *url.URL) bool
 
-func FilterHref(u *url.URL, filters ...HrefFilter) bool {
+func FilterURL(u *url.URL, filters ...URLFilter) bool {
 	for _, filter := range filters {
 		if !filter(u) {
 			return false
@@ -16,10 +16,10 @@ func FilterHref(u *url.URL, filters ...HrefFilter) bool {
 	return true
 }
 
-func filterHrefWithHTTP(u *url.URL) bool {
+func filterURLWithHTTP(u *url.URL) bool {
 	return u.Scheme == "https" || u.Scheme == "http"
 }
 
-func filterHrefWithJS(u *url.URL) bool {
+func filterURLWithJS(u *url.URL) bool {
 	return u.Scheme == "javascript"
 }

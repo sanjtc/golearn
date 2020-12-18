@@ -3,10 +3,11 @@ package main
 import (
 	"flag"
 	"fmt"
-	"log"
 	"net"
 	"path"
+	"strconv"
 	"strings"
+	"time"
 
 	"github.com/pantskun/commonutils/osutils"
 	"github.com/pantskun/commonutils/pathutils"
@@ -16,6 +17,13 @@ import (
 const interruptMsg = "interrupt"
 
 func main() {
+	startTime := time.Now()
+
+	defer func() {
+		useTime := time.Since(startTime)
+		xlogutil.Warning("use time:", useTime)
+	}()
+
 	var (
 		procNum int
 		url     string
@@ -24,11 +32,6 @@ func main() {
 	flag.IntVar(&procNum, "n", 1, "process number")
 	flag.StringVar(&url, "url", "https://www.ssetech.com.cn/", "url")
 	flag.Parse()
-
-	// if procNum > runtime.NumCPU() {
-	// 	procNum = runtime.NumCPU()
-	// 	log.Println("Number of CPU core is ", runtime.NumCPU())
-	// }
 
 	// 启动etcd
 	startEtcdCmd := osutils.NewCommand("etcd")
@@ -48,21 +51,24 @@ func main() {
 	// start n processes
 	mainPath := path.Join(pathutils.GetModulePath("CrawlerDemo"), "crawler", "main.go")
 
-	var multiProcCmd osutils.MultiProcCmd
-
-	if procNum > 1 {
-		multiProcCmd = osutils.NewMultiProcCmd(procNum, "go", "run", mainPath, "-url", url, "-useMultiprocess")
-	} else {
-		multiProcCmd = osutils.NewMultiProcCmd(procNum, "go", "run", mainPath, "-url", url)
-	}
-
-	if startEtcdCmd.GetCmdState() == osutils.ECmdStateError {
-		log.Println(startEtcdCmd.GetCmdError())
-		return
+	cmds := make([]osutils.Command, procNum)
+	for i := 0; i < procNum; i++ {
+		cmds[i] = osutils.NewCommand(
+			"go",
+			"run", mainPath,
+			"-url", url,
+			"-depth", "2",
+			"-log", "crawler"+strconv.Itoa(i)+".txt",
+			"-useMultiprocess",
+		)
+		cmds[i].RunAsyn()
 	}
 
 	go func() {
-		multiProcCmd.Run()
+		for _, cmd := range cmds {
+			for cmd.GetCmdState() == osutils.ECmdStateRunning {
+			}
+		}
 		waitChan <- 0
 	}()
 
@@ -70,7 +76,7 @@ func main() {
 	processRemoteInterrupt(":2233", interruptChan)
 
 	// 等待结果
-	log.Println(waitingResult(waitChan, interruptChan, multiProcCmd.GetCmds()))
+	xlogutil.Warning(waitingResult(waitChan, interruptChan, cmds /*multiProcCmd.GetCmds()*/))
 }
 
 func waitingResult(waitChan, interruptChan chan int, cmds []osutils.Command) string {
@@ -163,7 +169,7 @@ func listenRemoteInterrupt(addr string, interruptChan chan int) error {
 
 		msg := string(buf[:size])
 
-		log.Println("receive:", msg)
+		xlogutil.Warning("receive:", msg)
 
 		if msg == interruptMsg {
 			// 处理中断

@@ -1,7 +1,7 @@
 package xcrawler
 
 import (
-	"log"
+	"bytes"
 	"net/http"
 	"net/url"
 
@@ -12,13 +12,11 @@ import (
 
 type Crawler interface {
 	Visit(url string)
-
-	// AddHTMLHandler
-	// handle html node with filters, filters will be executed in order of input.
 	AddHTMLHandler(handler HTMLHandler, filters ...HTMLFilter)
-
 	AddRequestHandler(handler RequestHandler, filters ...RequestFilter)
 	AddResponseHandler(handler ResponseHandler, filters ...ResponseFilter)
+
+	visit(u *url.URL, depth int)
 }
 
 type crawler struct {
@@ -35,14 +33,14 @@ func NewCrawler(maxDepth int) Crawler {
 	return &crawler{maxDepth: maxDepth}
 }
 
-func (c *crawler) Visit(u string) {
-	ut, err := url.Parse(u)
+func (c *crawler) Visit(URL string) {
+	u, err := url.Parse(URL)
 	if err != nil {
 		xlogutil.Error(err)
 		return
 	}
 
-	c.visit(ut, 0)
+	c.visit(u, 0)
 }
 
 func (c *crawler) AddHTMLHandler(handler HTMLHandler, filters ...HTMLFilter) {
@@ -58,7 +56,7 @@ func (c *crawler) AddHTMLHandler(handler HTMLHandler, filters ...HTMLFilter) {
 }
 
 func (c *crawler) AddRequestHandler(handler RequestHandler, filters ...RequestFilter) {
-	h := func(req *http.Request) {
+	h := func(req Request) {
 		if !FilterRequest(req, filters...) {
 			return
 		}
@@ -70,7 +68,7 @@ func (c *crawler) AddRequestHandler(handler RequestHandler, filters ...RequestFi
 }
 
 func (c *crawler) AddResponseHandler(handler ResponseHandler, filters ...ResponseFilter) {
-	h := func(resp *http.Response) {
+	h := func(resp Response) {
 		if !FilterResponse(resp, filters...) {
 			return
 		}
@@ -82,73 +80,82 @@ func (c *crawler) AddResponseHandler(handler ResponseHandler, filters ...Respons
 }
 
 func (c *crawler) visit(u *url.URL, depth int) {
-	log.Println("visit:", u.String(), ", depth:", depth)
+	xlogutil.Warning("visit:", u.String(), ", depth:", depth)
 
-	if c.maxDepth > 0 && depth >= c.maxDepth {
+	if c.maxDepth >= 0 && depth > c.maxDepth {
+		xlogutil.Warning("reach max depth, stop")
 		return
 	}
 
-	rootNode := c.getRootNode(u)
-
-	if rootNode == nil {
-		xlogutil.Warning("root node is nil, skip")
-		return
-	}
-
-	rootElement := NewHTMLElement(rootNode, u, depth, c)
+	rootElement := c.getRootNode(u, depth)
 
 	c.traversingAllElement(rootElement)
 }
 
-func (c *crawler) getRootNode(u *url.URL) *html.Node {
+func (c *crawler) getRootNode(u *url.URL, depth int) HTMLElement {
+	var lastRawReq *http.Request
+
 	client := &http.Client{
 		CheckRedirect: func(req *http.Request, via []*http.Request) error {
-			return http.ErrUseLastResponse
+			lastRawReq = req
+			return nil
 		},
 	}
 
-	req := &http.Request{
+	rawReq := &http.Request{
 		Method: "GET",
 		URL:    u,
 		Header: http.Header{
 			"User-Agent": []string{"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36 Edg/87.0.664.60"},
 		},
 	}
+	// 封装http.Request
+	req := &request{rawReq: rawReq, depth: depth, c: c}
 
 	for _, handler := range c.requestHandlers {
 		handler(req)
 	}
 
-	// request经处理后为nil，则不发起请求
-	if req.URL == nil {
-		return nil
-	}
+	// request经处理后为nil，则不发起请求(client.Do中对request的url已经进行了错误检查)
+	// if req == nil || !req.IsValid() {
+	// 	return nil
+	// }
 
-	resp, err := client.Do(req)
+	rawResp, err := client.Do(req.rawReq)
 	if err != nil {
 		xlogutil.Error(err)
 		return nil
 	}
+	defer rawResp.Body.Close()
 
-	defer resp.Body.Close()
+	// 发生重定向时，response的request为最后一次请求的request
+	if lastRawReq != nil {
+		req.rawReq = lastRawReq
+	}
+
+	// 封装http.Response，body不需要立即读取，调用GetBody时进行读取
+	resp := &response{rawResp: rawResp, request: req, body: nil}
 
 	for _, handler := range c.responseHandlers {
 		handler(resp)
 	}
 
-	rootNode, err := html.Parse(resp.Body)
+	if resp.abandoned {
+		return nil
+	}
 
+	rootNode, err := html.Parse(bytes.NewReader(resp.GetBody()))
 	if err != nil {
 		xlogutil.Error(err)
 		return nil
 	}
 
-	return rootNode
+	return NewHTMLElement(rootNode, req)
 }
 
 func (c *crawler) traversingAllElement(rootElement HTMLElement) {
 	if rootElement == nil {
-		log.Println("warning:", "root node is nil")
+		xlogutil.Warning("root node is nil")
 		return
 	}
 
