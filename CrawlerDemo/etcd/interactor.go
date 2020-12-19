@@ -54,7 +54,7 @@ func NewInteractorWithEmbed() (Interactor, error) {
 	// ctx, cancel := context.WithTimeout(context.TODO(), timeoutSecond*time.Second)
 	// defer cancel()
 
-	s, ce := concurrency.NewSession(c /*concurrency.WithContext(ctx),*/, concurrency.WithTTL(300))
+	s, ce := concurrency.NewSession(c /*concurrency.WithContext(ctx),*/, concurrency.WithTTL(timeoutSecond))
 	if ce != nil {
 		return nil, ce
 	}
@@ -78,7 +78,7 @@ func NewInteractor() (Interactor, error) {
 	// ctx, cancel := context.WithTimeout(context.TODO(), timeoutSecond*time.Second)
 	// defer cancel()
 
-	s, ce := concurrency.NewSession(c /*concurrency.WithContext(ctx),*/, concurrency.WithTTL(300))
+	s, ce := concurrency.NewSession(c /*concurrency.WithContext(ctx),*/, concurrency.WithTTL(timeoutSecond))
 	if ce != nil {
 		return nil, ce
 	}

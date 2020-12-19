@@ -7,6 +7,7 @@ import (
 
 type HTMLElement interface {
 	Equal(HTMLElement) bool
+	GetRequest() Request
 
 	GetParent() HTMLElement
 	GetFirstChild() HTMLElement
@@ -18,8 +19,6 @@ type HTMLElement interface {
 	GetData() string
 	GetNamespace() string
 	GetAttr(string) string
-
-	GetRequest() Request
 }
 
 type htmlElement struct {
@@ -35,6 +34,10 @@ func (e *htmlElement) Equal(other HTMLElement) bool {
 	o := other.(*htmlElement)
 
 	return e.node == o.node && e.req == o.req
+}
+
+func (e *htmlElement) GetRequest() Request {
+	return e.req
 }
 
 func (e *htmlElement) GetParent() HTMLElement {
@@ -141,8 +144,4 @@ func (e *htmlElement) GetAttr(key string) string {
 	}
 
 	return ""
-}
-
-func (e *htmlElement) GetRequest() Request {
-	return e.req
 }

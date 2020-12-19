@@ -59,7 +59,8 @@ func TestVisit(t *testing.T) {
 	}
 
 	s := &serveHandler{}
-	go func() { http.ListenAndServe("localhost:2333", s) }()
+
+	go func() { _ = http.ListenAndServe("localhost:2333", s) }()
 
 	c := NewCrawler(2)
 	c.AddHTMLHandler(htmlHandler)

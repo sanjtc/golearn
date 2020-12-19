@@ -11,12 +11,12 @@ import (
 )
 
 type Crawler interface {
-	Visit(url string)
+	Visit(URL string)
 	AddHTMLHandler(handler HTMLHandler, filters ...HTMLFilter)
 	AddRequestHandler(handler RequestHandler, filters ...RequestFilter)
 	AddResponseHandler(handler ResponseHandler, filters ...ResponseFilter)
 
-	visit(u *url.URL, depth int)
+	visit(URL *url.URL, depth int)
 }
 
 type crawler struct {
