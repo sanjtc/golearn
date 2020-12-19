@@ -31,12 +31,14 @@ func HandleElementWithURL(element xcrawler.HTMLElement, etcdInteractor etcd.Inte
 
 	xlogutil.Warning("process:", key)
 
-	if u.Host == "" {
-		u.Host = element.GetRequest().GetRawReq().URL.Host
-	}
+	if u.Scheme != "javascript" {
+		if u.Scheme == "" {
+			u.Scheme = element.GetRequest().GetRawReq().URL.Scheme
+		}
 
-	if u.Scheme == "" {
-		u.Scheme = element.GetRequest().GetRawReq().URL.Scheme
+		if u.Host == "" {
+			u.Host = element.GetRequest().GetRawReq().URL.Host
+		}
 	}
 
 	hrefHandlers := []URLHandler{

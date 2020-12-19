@@ -82,3 +82,30 @@ func TestHandleElementWithURL2(t *testing.T) {
 
 	HandleElementWithURL(element, etcdInteractor)
 }
+
+// test sync false
+func TestHandleElementWithURL3(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	element := mock_xcrawler.NewMockHTMLElement(ctrl)
+	request := mock_xcrawler.NewMockRequest(ctrl)
+	etcdInteractor := mock_etcd.NewMockInteractor(ctrl)
+
+	u, _ := url.Parse("/test")
+
+	reqU, _ := url.Parse("https://www.test.com")
+	rawReq := &http.Request{URL: reqU}
+
+	element.EXPECT().GetAttr("href").Return("").AnyTimes()
+	element.EXPECT().GetAttr("src").Return(u.String()).AnyTimes()
+	element.EXPECT().GetRequest().Return(request).AnyTimes()
+
+	request.EXPECT().GetDepth().Return(1).AnyTimes()
+	request.EXPECT().GetRawReq().Return(rawReq).AnyTimes()
+	request.EXPECT().Visit("https://www.test.com/test").AnyTimes()
+
+	etcdInteractor.EXPECT().TxnSync(gomock.Any()).Return(false)
+
+	HandleElementWithURL(element, etcdInteractor)
+}
