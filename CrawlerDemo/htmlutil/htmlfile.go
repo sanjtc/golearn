@@ -6,13 +6,8 @@ import (
 	"github.com/pantskun/commonutils/pathutils"
 )
 
-type HTMLFile struct {
-	Path    string
-	Content []byte
-}
-
 // WriteToFile
-// 将content写入filePath文件中
+// 将content写入filePath文件中.
 func WriteToFile(filePath string, content []byte) error {
 	file, err := CreateFile(filePath)
 	if err != nil {
@@ -30,7 +25,7 @@ func WriteToFile(filePath string, content []byte) error {
 }
 
 // CreateFile
-// 创建fp文件
+// 创建fp文件.
 func CreateFile(fp string) (*os.File, error) {
 	p := pathutils.GetParentPath(fp)
 	if p != fp {
