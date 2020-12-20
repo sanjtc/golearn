@@ -1,9 +1,11 @@
 package main
 
 import (
+	"context"
 	"flag"
-	"fmt"
+	"io/ioutil"
 	"net"
+	"os"
 	"path"
 	"strconv"
 	"strings"
@@ -17,6 +19,7 @@ import (
 const interruptMsg = "interrupt"
 
 func main() {
+	// 计时
 	startTime := time.Now()
 
 	defer func() {
@@ -24,6 +27,13 @@ func main() {
 		xlogutil.Warning("use time:", useTime)
 	}()
 
+	interruptChan := make(chan int)
+	// 处理远程中断
+	processRemoteInterrupt(":2233", interruptChan)
+	// 处理本地中断
+	processLocalInterrupt(interruptChan)
+
+	// cmd参数
 	var (
 		procNum int
 		url     string
@@ -46,10 +56,10 @@ func main() {
 	}()
 
 	waitChan := make(chan int)
-	interruptChan := make(chan int)
 
-	// start n processes
-	mainPath := path.Join(pathutils.GetModulePath("CrawlerDemo"), "crawler", "main.go")
+	// 开启n个crawler进程
+	modulePath := pathutils.GetModulePath("CrawlerDemo")
+	mainPath := path.Join(modulePath, "crawler", "main.go")
 
 	cmds := make([]osutils.Command, procNum)
 	for i := 0; i < procNum; i++ {
@@ -64,6 +74,7 @@ func main() {
 		cmds[i].RunAsyn()
 	}
 
+	// 等待所有crawler进程执行完成
 	go func() {
 		for _, cmd := range cmds {
 			for cmd.GetCmdState() == osutils.ECmdStateRunning {
@@ -72,70 +83,113 @@ func main() {
 		waitChan <- 0
 	}()
 
-	// 处理远程中断
-	processRemoteInterrupt(":2233", interruptChan)
-
 	// 等待结果
-	xlogutil.Warning(waitingResult(waitChan, interruptChan, cmds /*multiProcCmd.GetCmds()*/))
-}
-
-func waitingResult(waitChan, interruptChan chan int, cmds []osutils.Command) string {
 	select {
 	case <-waitChan:
 		{
+			// 日志文件路径
+			logPaths := []string{}
+			for i := 0; i < procNum; i++ {
+				logPaths = append(logPaths, path.Join(modulePath, "logs", "crawler"+strconv.Itoa(i)+".txt"))
+			}
+
+			// 读取日志内容
+			fileContents := loadLogs(logPaths)
+
 			// 检查执行结果
-			if checkCmdOuts(cmds) {
-				return "successed"
+			if checkLogs(fileContents) {
+				xlogutil.Warning("successed")
 			} else {
-				return "failed"
+				xlogutil.Warning("failed")
 			}
 		}
 	case <-interruptChan:
 		{
+			// 结束所有crawler进程
 			for _, cmd := range cmds {
 				if cmd == nil {
 					continue
 				}
-				if err := cmd. /*Process.*/ Kill(); err != nil {
+				if err := cmd.Kill(); err != nil {
 					xlogutil.Error(err)
 				}
 			}
-			return interruptMsg
+			xlogutil.Warning(interruptMsg)
 		}
 	}
 }
 
-func checkCmdOuts(cmds []osutils.Command) bool {
-	n := len(cmds)
-	outs := make([][]string, n)
+func loadLogs(filePaths []string) (fileContents [][]string) {
+	n := len(filePaths)
+	fileContents = make([][]string, n)
 
-	for i, cmd := range cmds {
-		// 有命令执行失败，返回false
-		if cmd.GetCmdState() == osutils.ECmdStateError {
+	for i, filePath := range filePaths {
+		file, err := os.Open(filePath)
+		if err != nil {
+			xlogutil.Error(err)
+			return nil
+		}
+
+		fileContent, err := ioutil.ReadAll(file)
+		if err != nil {
+			xlogutil.Error(err)
+			return nil
+		}
+
+		fileContents[i] = strings.Split(string(fileContent), "\n")
+	}
+
+	return
+}
+
+func checkLogs(fileContents [][]string) bool {
+	logs := make(map[string]int)
+
+	for i, fileContent := range fileContents {
+		if len(fileContent) == 0 {
 			return false
 		}
 
-		outs[i] = strings.Split(cmd.GetStdout(), "\n")
-		outs[i] = outs[i][0 : len(outs[i])-1]
-	}
+		if fileContent[len(fileContent)-1] == "" {
+			fileContent = fileContent[:len(fileContent)-1]
+		}
 
-	maps := make(map[string]int)
+		if !strings.Contains(fileContent[len(fileContent)-1], "finished") {
+			xlogutil.Error("crawler " + strconv.Itoa(i) + ": not finished")
+			return false
+		}
 
-	for _, out := range outs {
-		for _, url := range out {
-			if maps[url] == 0 {
-				maps[url] = 1
+		for _, log := range fileContent {
+			if !strings.Contains(log, "download:") {
 				continue
 			}
 
-			if maps[url] == 1 {
-				fmt.Println(url)
+			if logs[log] == 0 {
+				logs[log] = 1
+				continue
+			}
+
+			if logs[log] == 1 {
+				xlogutil.Error("crawler " + strconv.Itoa(i) + ": download duplicate content")
 				return false
 			}
 		}
 	}
 
 	return true
+}
+
+func processLocalInterrupt(interruptChan chan int) {
+	ctx, cancel := context.WithCancel(context.TODO())
+	defer cancel()
+
+	signalChan := make(chan os.Signal)
+	osutils.ListenSystemSignalsWithCtx(ctx, cancel, signalChan, os.Interrupt)
+
+	go func() {
+		<-ctx.Done()
+		interruptChan <- 0
+	}()
 }
 
 func processRemoteInterrupt(listenAddr string, interruptChan chan int) {

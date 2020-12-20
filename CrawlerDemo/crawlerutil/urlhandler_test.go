@@ -49,7 +49,7 @@ func TestNewHandlerWithFilters(t *testing.T) {
 
 	for _, testCase := range testCases {
 		u, _ := url.Parse(testCase.u)
-		handler := NewHandlerWithFilters(testCase.handler, testCase.filters...)
+		handler := NewURLHandlerWithFilters(testCase.handler, testCase.filters...)
 		got := handler(u)
 		assert.Equal(t, testCase.expected, got)
 	}

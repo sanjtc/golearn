@@ -42,8 +42,8 @@ func HandleElementWithURL(element xcrawler.HTMLElement, etcdInteractor etcd.Inte
 	}
 
 	hrefHandlers := []URLHandler{
-		NewHandlerWithFilters(handleURLWithHTTP, filterURLWithHTTP),
-		NewHandlerWithFilters(handleURLWithJS, filterURLWithJS),
+		NewURLHandlerWithFilters(handleURLWithHTTP, filterURLWithHTTP),
+		NewURLHandlerWithFilters(handleURLWithJS, filterURLWithJS),
 	}
 
 	for _, handler := range hrefHandlers {

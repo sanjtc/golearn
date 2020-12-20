@@ -8,7 +8,7 @@ import (
 
 type URLHandler func(u *url.URL) bool
 
-func NewHandlerWithFilters(handler URLHandler, filters ...URLFilter) URLHandler {
+func NewURLHandlerWithFilters(handler URLHandler, filters ...URLFilter) URLHandler {
 	return func(u *url.URL) bool {
 		if !FilterURL(u, filters...) {
 			return false
