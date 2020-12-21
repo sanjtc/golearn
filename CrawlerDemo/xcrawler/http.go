@@ -41,6 +41,7 @@ func (req *request) Visit(URL string) {
 }
 
 type Response interface {
+	GetRawResp() *http.Response
 	GetStatusCode() int
 	GetStatus() string
 	GetRequest() Request
@@ -59,6 +60,10 @@ type response struct {
 
 func NewResponse(rawResp *http.Response, req Request, body *[]byte) Response {
 	return &response{rawResp: rawResp, request: req, body: body}
+}
+
+func (resp *response) GetRawResp() *http.Response {
+	return resp.rawResp
 }
 
 func (resp *response) GetStatusCode() int {

@@ -160,7 +160,7 @@ func checkLogs(fileContents [][]string) bool {
 		}
 
 		for _, log := range fileContent {
-			if !strings.Contains(log, "download:") {
+			if !strings.Contains(log, "download:") && !strings.Contains(log, "process:") {
 				continue
 			}
 
@@ -170,7 +170,9 @@ func checkLogs(fileContents [][]string) bool {
 			}
 
 			if logs[log] == 1 {
-				xlogutil.Error("crawler " + strconv.Itoa(i) + ": download duplicate content")
+				xlogutil.Error("crawler " + strconv.Itoa(i) + ": download or process duplicate content")
+				xlogutil.Error(log)
+
 				return false
 			}
 		}

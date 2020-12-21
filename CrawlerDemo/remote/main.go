@@ -54,7 +54,7 @@ func main() {
 		func() error {
 			xlogutil.Warning("uploadTask start")
 
-			if err := UploadSrc(remoteIP, remotePort, remoteUser, remotePwd, uploadPath); err != nil {
+			if err := uploadSrc(remoteIP, remotePort, remoteUser, remotePwd, uploadPath); err != nil {
 				return err
 			}
 
@@ -69,7 +69,7 @@ func main() {
 		func() error {
 			xlogutil.Warning("runTask start")
 
-			if err := RunSrc(remoteIP, remotePort, remoteUser, remotePwd, procNum, url); err != nil {
+			if err := runSrc(remoteIP, remotePort, remoteUser, remotePwd, procNum, url); err != nil {
 				return err
 			}
 
@@ -100,7 +100,7 @@ func main() {
 		select {
 		case <-ctx.Done():
 			{
-				if err := ProcessInterrupt(remoteIP, "2233"); err != nil {
+				if err := processInterrupt(remoteIP, "2233"); err != nil {
 					xlogutil.Error(err)
 				}
 			}
@@ -112,7 +112,7 @@ func main() {
 	}
 }
 
-func UploadSrc(ip, port, user, pwd, uploadPath string) error {
+func uploadSrc(ip, port, user, pwd, uploadPath string) error {
 	sftpConfig := remotesftp.SFTPConfig{
 		Network:  "tcp",
 		IP:       ip,
@@ -134,7 +134,7 @@ func UploadSrc(ip, port, user, pwd, uploadPath string) error {
 	return nil
 }
 
-func RunSrc(ip, port, user, pwd string, procNum int, url string) error {
+func runSrc(ip, port, user, pwd string, procNum int, url string) error {
 	sshConfig := remotessh.SSHConfig{
 		Network:  "tcp",
 		IP:       ip,
@@ -162,7 +162,7 @@ func RunSrc(ip, port, user, pwd string, procNum int, url string) error {
 	return nil
 }
 
-func ProcessInterrupt(ip, port string) error {
+func processInterrupt(ip, port string) error {
 	conn, err := net.Dial("tcp", ip+":"+port)
 	if err != nil {
 		return err

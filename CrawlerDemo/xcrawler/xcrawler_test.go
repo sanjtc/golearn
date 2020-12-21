@@ -157,3 +157,39 @@ func TestDepth(t *testing.T) {
 	assert.False(t, responseHandlerExecute)
 	assert.False(t, htmlHandlerExecute)
 }
+
+func TestAbandon(t *testing.T) {
+	s := &serveHandler{}
+
+	go func() { _ = http.ListenAndServe("localhost:2333", s) }()
+
+	var (
+		htmlHandlerExecute     bool = false
+		requestHandlerExecute  bool = false
+		responseHandlerExecute bool = false
+	)
+
+	requestHandler := func(req Request) {
+		requestHandlerExecute = true
+	}
+	responseHandler := func(resp Response) {
+		responseHandlerExecute = true
+
+		resp.Abandon()
+	}
+	htmlHandler := func(e HTMLElement) {
+		htmlHandlerExecute = true
+	}
+
+	c := NewCrawler(2)
+	c.AddHTMLHandler(htmlHandler)
+	c.AddRequestHandler(requestHandler)
+	c.AddResponseHandler(responseHandler)
+
+	u, _ := url.Parse("http://localhost:2333")
+	c.visit(u, 0)
+
+	assert.True(t, requestHandlerExecute)
+	assert.True(t, responseHandlerExecute)
+	assert.False(t, htmlHandlerExecute)
+}

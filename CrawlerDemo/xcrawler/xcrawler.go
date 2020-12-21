@@ -87,19 +87,14 @@ func (c *crawler) visit(u *url.URL, depth int) {
 		return
 	}
 
-	rootElement := c.getRootNode(u, depth)
-
-	c.traversingAllElement(rootElement)
-}
-
-func (c *crawler) getRootNode(u *url.URL, depth int) HTMLElement {
-	var lastRawReq *http.Request
+	// 开始请求
+	// var lastRawReq *http.Request
 
 	client := &http.Client{
-		CheckRedirect: func(req *http.Request, via []*http.Request) error {
-			lastRawReq = req
-			return nil
-		},
+		// CheckRedirect: func(req *http.Request, via []*http.Request) error {
+		// 	lastRawReq = req
+		// 	return nil
+		// },
 	}
 
 	rawReq := &http.Request{
@@ -116,22 +111,18 @@ func (c *crawler) getRootNode(u *url.URL, depth int) HTMLElement {
 		handler(req)
 	}
 
-	// request经处理后为nil，则不发起请求(client.Do中对request的url已经进行了错误检查)
-	// if req == nil || !req.IsValid() {
-	// 	return nil
-	// }
-
 	rawResp, err := client.Do(req.rawReq)
 	if err != nil {
 		xlogutil.Error(err)
-		return nil
+		return
 	}
 	defer rawResp.Body.Close()
 
 	// 发生重定向时，response的request为最后一次请求的request
-	if lastRawReq != nil {
-		req.rawReq = lastRawReq
-	}
+	// if lastRawReq != nil {
+	// 	req.rawReq = lastRawReq
+	// }
+	req.rawReq = rawResp.Request
 
 	// 封装http.Response，body不需要立即读取，调用GetBody时进行读取
 	resp := &response{rawResp: rawResp, request: req, body: nil}
@@ -141,17 +132,75 @@ func (c *crawler) getRootNode(u *url.URL, depth int) HTMLElement {
 	}
 
 	if resp.abandoned {
-		return nil
+		return
 	}
 
 	rootNode, err := html.Parse(bytes.NewReader(resp.GetBody()))
 	if err != nil {
 		xlogutil.Error(err)
-		return nil
+		return
 	}
 
-	return NewHTMLElement(rootNode, req)
+	rootElement := NewHTMLElement(rootNode, req)
+
+	c.traversingAllElement(rootElement)
 }
+
+// func (c *crawler) getRootNode(u *url.URL, depth int) HTMLElement {
+// 	var lastRawReq *http.Request
+
+// 	client := &http.Client{
+// 		CheckRedirect: func(req *http.Request, via []*http.Request) error {
+// 			lastRawReq = req
+// 			return nil
+// 		},
+// 	}
+
+// 	rawReq := &http.Request{
+// 		Method: "GET",
+// 		URL:    u,
+// 		Header: http.Header{
+// 			"User-Agent": []string{"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36 Edg/87.0.664.60"},
+// 		},
+// 	}
+// 	// 封装http.Request
+// 	req := &request{rawReq: rawReq, depth: depth, c: c}
+
+// 	for _, handler := range c.requestHandlers {
+// 		handler(req)
+// 	}
+
+// 	rawResp, err := client.Do(req.rawReq)
+// 	if err != nil {
+// 		xlogutil.Error(err)
+// 		return nil
+// 	}
+// 	defer rawResp.Body.Close()
+
+// 	// 发生重定向时，response的request为最后一次请求的request
+// 	if lastRawReq != nil {
+// 		req.rawReq = lastRawReq
+// 	}
+
+// 	// 封装http.Response，body不需要立即读取，调用GetBody时进行读取
+// 	resp := &response{rawResp: rawResp, request: req, body: nil}
+
+// 	for _, handler := range c.responseHandlers {
+// 		handler(resp)
+// 	}
+
+// 	if resp.abandoned {
+// 		return nil
+// 	}
+
+// 	rootNode, err := html.Parse(bytes.NewReader(resp.GetBody()))
+// 	if err != nil {
+// 		xlogutil.Error(err)
+// 		return nil
+// 	}
+
+// 	return NewHTMLElement(rootNode, req)
+// }
 
 func (c *crawler) traversingAllElement(rootElement HTMLElement) {
 	if rootElement == nil {

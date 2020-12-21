@@ -15,7 +15,7 @@ import (
 // HandleDownloadResp
 // downloadURL中，若u发生重定向，则u更新为重定向后的地址.
 func HandleDownloadResp(resp xcrawler.Response, etcdInteractor etcd.Interactor) {
-	u := resp.GetRequest().GetRawReq().URL
+	u := resp.GetRawResp().Request.URL
 
 	if resp.GetStatusCode() >= http.StatusBadRequest {
 		xlogutil.Warning(u.String(), " response status ", resp.GetStatusCode())
