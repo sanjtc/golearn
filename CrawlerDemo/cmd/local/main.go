@@ -59,7 +59,7 @@ func main() {
 
 	// 开启n个crawler进程
 	modulePath := pathutils.GetModulePath("CrawlerDemo")
-	mainPath := path.Join(modulePath, "crawler", "main.go")
+	mainPath := path.Join(modulePath, "cmd", "crawler", "main.go")
 
 	cmds := make([]osutils.Command, procNum)
 	for i := 0; i < procNum; i++ {

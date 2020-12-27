@@ -28,6 +28,7 @@ github.com/google/go-cmp v0.4.0/go.mod h1:v8dTdLbMG2kIc/vJvl+f65V22dbkXbowE6jgT/
 github.com/google/go-cmp v0.5.0/go.mod h1:v8dTdLbMG2kIc/vJvl+f65V22dbkXbowE6jgT/gNBxE=
 github.com/pantskun/golearn v0.0.0-20200915064530-4e57b703fa37 h1:47DEQpj8HBSa+/TImW+5JCeuQeRkm5NMpJWZG3hSuFU=
 github.com/pantskun/golearn v0.0.0-20200915105326-aaebe3e9d2ec h1:47DEQpj8HBSa+/TImW+5JCeuQeRkm5NMpJWZG3hSuFU=
+github.com/pantskun/golearn v0.0.0-20201221052930-5458d9382b9c h1:47DEQpj8HBSa+/TImW+5JCeuQeRkm5NMpJWZG3hSuFU=
 github.com/pantskun/golearn/rpcDemo v0.0.0-20200915064530-4e57b703fa37 h1:BZtOd2gWCI/yevSxVZ4EGdDH0H1nhXymzVx07fIyE6M=
 github.com/pantskun/golearn/rpcDemo v0.0.0-20200915064530-4e57b703fa37/go.mod h1:cqU4GS5DM11QdzE7tnvKWBjBhOJC2/qsSXG6mjEGf/Q=
 github.com/pantskun/golearn/rpcDemo v0.0.0-20200915105326-aaebe3e9d2ec h1:WE5l/tBXUsqGA9IAEVmWvE9p0sHBOusJ5rMSvUZ2yCM=

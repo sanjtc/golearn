@@ -18,7 +18,7 @@
             "type": "go",
             "request": "launch",
             "mode": "auto",
-            "program": "${workspaceFolder}/local/main.go",
+            "program": "${workspaceFolder}/cmd/local/main.go",
             "env": {},
             "args": [
                 "-n",
@@ -30,7 +30,7 @@
             "type": "go",
             "request": "launch",
             "mode": "auto",
-            "program": "${workspaceFolder}/remote/main.go",
+            "program": "${workspaceFolder}/cmd/remote/main.go",
             "env": {},
             "args": [
                 "-n",
@@ -42,7 +42,7 @@
             "type": "go",
             "request": "launch",
             "mode": "auto",
-            "program": "${workspaceFolder}/crawler/main.go",
+            "program": "${workspaceFolder}/cmd/crawler/main.go",
             "env": {},
             "args": [
                 "-depth",

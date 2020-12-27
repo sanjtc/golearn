@@ -149,7 +149,7 @@ func runSrc(ip, port, user, pwd string, procNum int, url string) error {
 	}
 
 	cmds := []string{
-		"cd /home/wx/CrawlerDemo/local",
+		"cd /home/wx/CrawlerDemo/cmd/local",
 		"go run main.go -n " + strconv.Itoa(procNum) + " -url " + url,
 	}
 
